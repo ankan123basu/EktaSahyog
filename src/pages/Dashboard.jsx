@@ -230,7 +230,7 @@ const Dashboard = () => {
                 {/* Header */}
                 <div className="flex flex-col lg:flex-row justify-between items-center mb-8 gap-6 border-b border-white/10 pb-6">
                     <div>
-                        <h1 className="text-6xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] animate-gradient tracking-tight drop-shadow-[0_0_30px_rgba(168,85,247,0.5)] font-display">
+                        <h1 className="text-6xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] animate-gradient-x bg-[length:200%_auto] tracking-tight drop-shadow-[0_0_30px_rgba(168,85,247,0.5)] font-display">
                             Analytics Command Center
                         </h1>
                         <p className="text-gray-300 mt-2 flex items-center gap-2 text-xl font-light">

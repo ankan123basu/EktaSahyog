@@ -76,6 +76,8 @@ const Landing = () => {
     ];
 
     const containerRef = React.useRef(null);
+    const featuresRef = React.useRef(null);
+    const testimonialsRef = React.useRef(null);
 
     const user = JSON.parse(localStorage.getItem('user'));
     const destination = user ? '/marketplace' : '/auth';
@@ -228,7 +230,7 @@ const Landing = () => {
             </div>
 
             {/* Features Grid: 6 KADAM */}
-            <section className="relative px-4 sm:px-6 lg:px-8 py-24 bg-black/10 backdrop-blur-sm z-10 overflow-hidden">
+            <section ref={featuresRef} className="relative px-4 sm:px-6 lg:px-8 py-24 bg-black/10 backdrop-blur-sm z-10 overflow-hidden">
                 <div className="absolute inset-0 z-0 opacity-30">
                     <Ballpit count={30} gravity={0.5} friction={0.9} wallBounce={0.9} followCursor={true} colors={[0xff9933, 0xffffff, 0x138808]} />
                 </div>
@@ -239,9 +241,15 @@ const Landing = () => {
                             whileInView={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.8, ease: "backOut" }}
                         >
-                            <h2 className="text-4xl md:text-6xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] drop-shadow-lg">
-                                6 KADAM, EKTA KI AUR
-                            </h2>
+                            <VariableProximity
+                                label="6 KADAM, EKTA KI AUR"
+                                className="text-4xl md:text-6xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] drop-shadow-lg cursor-default h-20"
+                                fromFontVariationSettings="'wght' 400, 'opsz' 9"
+                                toFontVariationSettings="'wght' 900, 'opsz' 40"
+                                containerRef={featuresRef}
+                                radius={100}
+                                falloff="linear"
+                            />
                             <div className="h-1.5 w-32 bg-gradient-to-r from-unity-saffron to-unity-emerald mx-auto rounded-full shadow-[0_0_15px_rgba(255,153,51,0.5)]" />
                         </motion.div>
                     </div>
@@ -283,7 +291,7 @@ const Landing = () => {
             </section>
 
             {/* Floating Testimonials: DIL KI BAAT */}
-            <section className="relative py-32 overflow-hidden bg-black/20">
+            <section ref={testimonialsRef} className="relative py-32 overflow-hidden bg-black/20">
                 <div className="absolute inset-0 bg-gradient-to-b from-unity-dark via-black/40 to-unity-dark z-0 pointer-events-none" />
 
                 {/* Floating Particles Background */}
@@ -298,9 +306,15 @@ const Landing = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}
                         >
-                            <h2 className="text-4xl md:text-6xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] drop-shadow-2xl">
-                                DIL KI BAAT, DESH KE SAATH
-                            </h2>
+                            <VariableProximity
+                                label="DIL KI BAAT, DESH KE SAATH"
+                                className="text-4xl md:text-6xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] drop-shadow-2xl cursor-default h-20"
+                                fromFontVariationSettings="'wght' 400, 'opsz' 9"
+                                toFontVariationSettings="'wght' 900, 'opsz' 40"
+                                containerRef={testimonialsRef}
+                                radius={100}
+                                falloff="linear"
+                            />
                             <p className="text-gray-300 text-xl max-w-2xl mx-auto font-light tracking-wide">
                                 Real stories. Real connections. <span className="text-unity-saffron font-medium">One India.</span>
                             </p>

@@ -86,7 +86,7 @@ const Stories = () => {
 
             <div className="max-w-7xl mx-auto relative z-10">
                 <div className="text-center md:text-left mb-2">
-                    <h1 className="text-5xl md:text-7xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] mb-2">
+                    <h1 className="text-5xl md:text-7xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] animate-gradient-x bg-[length:200%_auto] drop-shadow-2xl tracking-tight mb-2">
                         VOICES OF UNITY
                     </h1>
                 </div>

@@ -141,14 +141,14 @@ const CulturalHotspots = () => {
             <BackgroundBeams />
 
             <div className="relative z-10 mb-12 max-w-7xl mx-auto">
-                <div className="text-center md:text-left mb-6">
-                    <h1 className="text-5xl md:text-7xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] mb-4">
+                <div className="text-center md:text-left mb-2">
+                    <h1 className="text-5xl md:text-7xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] animate-gradient-x bg-[length:200%_auto] drop-shadow-2xl tracking-tight mb-2">
                         CULTURAL HOTSPOTS
                     </h1>
                 </div>
 
                 {/* Subheading + Button + Filter Row */}
-                <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-white/10 pb-6">
+                <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 border-b border-white/10 pb-6">
                     <div className="max-w-2xl">
                         <p className="text-xl text-gray-300">
                             Discover and share the hidden gems of India's heritage.
