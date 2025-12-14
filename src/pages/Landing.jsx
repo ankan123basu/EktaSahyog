@@ -227,42 +227,51 @@ const Landing = () => {
                 </section>
             </div>
 
-            {/* Features Grid */}
+            {/* Features Grid: 6 KADAM */}
             <section className="relative px-4 sm:px-6 lg:px-8 py-24 bg-black/10 backdrop-blur-sm z-10 overflow-hidden">
                 <div className="absolute inset-0 z-0 opacity-30">
                     <Ballpit count={30} gravity={0.5} friction={0.9} wallBounce={0.9} followCursor={true} colors={[0xff9933, 0xffffff, 0x138808]} />
                 </div>
                 <div className="max-w-7xl mx-auto relative z-10">
                     <div className="text-center mb-20">
-                        <h2 className="text-3xl md:text-5xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808]">
-                            6 KADAM, EKTA KI AUR
-                        </h2>
-                        <div className="h-1.5 w-32 bg-gradient-to-r from-unity-saffron to-unity-emerald mx-auto rounded-full" />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.8, ease: "backOut" }}
+                        >
+                            <h2 className="text-4xl md:text-6xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] drop-shadow-lg">
+                                6 KADAM, EKTA KI AUR
+                            </h2>
+                            <div className="h-1.5 w-32 bg-gradient-to-r from-unity-saffron to-unity-emerald mx-auto rounded-full shadow-[0_0_15px_rgba(255,153,51,0.5)]" />
+                        </motion.div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 perspective-1000">
                         {features.map((feature, index) => (
                             <motion.div
                                 key={index}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                whileHover={{ y: -10, rotate: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
-                                className="h-full"
+                                initial={{ opacity: 0, y: 50, rotateX: -10 }}
+                                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ delay: index * 0.15, duration: 0.6, type: "spring" }}
+                                whileHover={{ y: -15, scale: 1.05, rotateY: 5, zIndex: 10 }}
+                                className="h-full relative group"
                             >
-                                <ElectricBorder color={index % 2 === 0 ? "#FF9933" : "#138808"} className="h-full">
-                                    <div className="relative h-full bg-unity-dark/60 p-8 rounded-xl backdrop-blur-md overflow-hidden">
-                                        {/* Spotlight Effect */}
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                                <ElectricBorder color={index % 2 === 0 ? "#FF9933" : "#138808"} className="h-full rounded-2xl shadow-2xl">
+                                    <div className="relative h-full bg-black/40 p-8 rounded-2xl backdrop-blur-xl border border-white/5 overflow-hidden transition-colors hover:bg-white/5">
+                                        {/* Animated Background Gradient on Hover */}
+                                        <div className="absolute inset-0 bg-gradient-to-br from-unity-saffron/10 via-transparent to-unity-emerald/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                                        <div className="mb-6 p-4 bg-white/5 w-fit rounded-2xl group-hover:scale-110 transition-transform duration-300 border border-white/10">
-                                            {feature.icon}
+                                        {/* Spotlight Shine */}
+                                        <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 group-hover:left-[100%] transition-all duration-1000 ease-in-out" />
+
+                                        <div className="mb-6 p-4 bg-white/5 w-fit rounded-2xl group-hover:scale-110 group-hover:bg-white/10 transition-all duration-300 border border-white/10 shadow-[0_0_15px_rgba(255,255,255,0.05)] group-hover:shadow-[0_0_20px_rgba(255,153,51,0.3)]">
+                                            {React.cloneElement(feature.icon, { className: `w-8 h-8 ${index % 2 === 0 ? 'text-unity-saffron' : 'text-unity-emerald'} transition-colors` })}
                                         </div>
-                                        <h3 className="text-xl font-bold text-white mb-4 font-display text-sm tracking-widest uppercase">
+                                        <h3 className="text-2xl font-bold text-white mb-4 font-display tracking-wide group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-300 transition-all">
                                             {feature.title}
                                         </h3>
-                                        <p className="text-gray-400 leading-relaxed text-base">
+                                        <p className="text-gray-400 leading-relaxed text-base group-hover:text-gray-300 transition-colors">
                                             {feature.desc}
                                         </p>
                                     </div>
@@ -273,36 +282,45 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* Floating Testimonials Section - Infinite Marquee */}
-            <section className="relative py-32 overflow-hidden bg-black/10">
-                <div className="absolute inset-0 bg-gradient-to-b from-unity-dark/80 to-black/50 z-0" />
-                <div className="absolute inset-0 z-0 opacity-30">
-                    <Ballpit count={35} gravity={0.2} friction={0.95} wallBounce={0.95} followCursor={true} colors={[0xff9933, 0xffffff, 0x138808]} />
+            {/* Floating Testimonials: DIL KI BAAT */}
+            <section className="relative py-32 overflow-hidden bg-black/20">
+                <div className="absolute inset-0 bg-gradient-to-b from-unity-dark via-black/40 to-unity-dark z-0 pointer-events-none" />
+
+                {/* Floating Particles Background */}
+                <div className="absolute inset-0 z-0 opacity-40">
+                    <Ballpit count={40} gravity={0.1} friction={0.99} wallBounce={0.99} followCursor={false} colors={[0xff9933, 0xffffff, 0x138808]} />
                 </div>
+
                 <div className="relative z-10 w-full">
-                    <div className="text-center mb-16 px-4">
-                        <h2 className="text-3xl md:text-5xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808]">
-                            DIL KI BAAT, DESH KE SAATH
-                        </h2>
-                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                            Real stories from real people connecting across borders.
-                        </p>
+                    <div className="text-center mb-20 px-4">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <h2 className="text-4xl md:text-6xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] drop-shadow-2xl">
+                                DIL KI BAAT, DESH KE SAATH
+                            </h2>
+                            <p className="text-gray-300 text-xl max-w-2xl mx-auto font-light tracking-wide">
+                                Real stories. Real connections. <span className="text-unity-saffron font-medium">One India.</span>
+                            </p>
+                        </motion.div>
                     </div>
 
-                    {/* Marquee Container */}
-                    <div className="flex overflow-hidden relative w-full mask-gradient-x">
+                    {/* Enhanced Marquee */}
+                    <div className="flex overflow-hidden relative w-full mask-gradient-x py-10">
                         <motion.div
-                            className="flex gap-8 px-8 w-max"
+                            className="flex gap-10 px-10 w-max"
                             animate={{ x: ["0%", "-50%"] }}
                             transition={{
-                                duration: 40,
+                                duration: 50,
                                 repeat: Infinity,
                                 ease: "linear",
                                 repeatType: "loop"
                             }}
                         >
-                            {/* Duplicate items for seamless loop */}
-                            {[...Array(2)].map((_, setIndex) => (
+                            {/* Triple Loop for smoothness */}
+                            {[...Array(3)].map((_, setIndex) => (
                                 <React.Fragment key={setIndex}>
                                     {[
                                         {
@@ -310,63 +328,67 @@ const Landing = () => {
                                             role: "Artisan, Rajasthan",
                                             text: "I sold my blue pottery to a family in Kerala through EktaSahyog. It felt like my art traveled further than I ever could.",
                                             color: "border-unity-saffron",
-                                            bg: "bg-orange-950/20"
+                                            bg: "bg-gradient-to-br from-orange-950/40 to-transparent"
                                         },
                                         {
                                             name: "Rahul Menon",
                                             role: "Student, Kerala",
                                             text: "The 'Learn My Culture' cards helped me understand Bihu. Now I have 3 pen-pals from Assam!",
                                             color: "border-unity-emerald",
-                                            bg: "bg-green-950/20"
+                                            bg: "bg-gradient-to-br from-green-950/40 to-transparent"
                                         },
                                         {
                                             name: "Tashi Dorjee",
                                             role: "NGO Lead, Sikkim",
                                             text: "We found volunteers for our eco-project from 5 different states. The Unity Projects feature is a game changer.",
                                             color: "border-unity-coral",
-                                            bg: "bg-red-950/20"
+                                            bg: "bg-gradient-to-br from-red-950/40 to-transparent"
                                         },
                                         {
                                             name: "Anjali Gupta",
                                             role: "Chef, Lucknow",
                                             text: "Sharing my Awadhi recipes on the Culture hub connected me with foodies in Gujarat. Food truly has no borders!",
                                             color: "border-unity-saffron",
-                                            bg: "bg-yellow-950/20"
+                                            bg: "bg-gradient-to-br from-yellow-950/40 to-transparent"
                                         },
                                         {
                                             name: "Vikram Singh",
                                             role: "Musician, Punjab",
                                             text: "The Cultural Arcade's music quiz introduced me to Carnatic rhythms. It's inspiring my new fusion track.",
                                             color: "border-purple-500",
-                                            bg: "bg-purple-950/20"
+                                            bg: "bg-gradient-to-br from-purple-950/40 to-transparent"
                                         }
                                     ].map((testimonial, i) => (
-                                        <div
+                                        <motion.div
                                             key={`${setIndex}-${i}`}
-                                            className="w-[350px] md:w-[450px] flex-shrink-0"
+                                            className="w-[400px] flex-shrink-0"
+                                            whileHover={{ scale: 1.05, y: -10, rotate: setIndex % 2 === 0 ? 1 : -1 }}
+                                            transition={{ type: "spring", stiffness: 300 }}
                                         >
-                                            <ElectricBorder color={testimonial.color.includes('saffron') ? '#FF9933' : testimonial.color.includes('emerald') ? '#138808' : '#f43f5e'}>
-                                                <div className={`p-8 rounded-2xl backdrop-blur-md border border-white/5 hover:border-white/20 transition-all h-full flex flex-col justify-between group hover:scale-[1.02] duration-300 ${testimonial.bg}`}>
-                                                    <div className="relative">
-                                                        <div className="absolute -top-4 -left-4 text-4xl opacity-20 font-serif">"</div>
-                                                        <p className="text-gray-200 italic mb-6 text-lg leading-relaxed relative z-10 pl-2">
-                                                            {testimonial.text}
+                                            <div className={`p-8 rounded-3xl backdrop-blur-xl border border-white/10 h-full flex flex-col justify-between shadow-2xl relative overflow-hidden group ${testimonial.bg}`}>
+                                                {/* Card Glow Effect */}
+                                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-[50px] group-hover:bg-white/10 transition-all" />
+
+                                                <div className="relative z-10">
+                                                    <div className="text-5xl opacity-30 font-serif mb-4 text-white">"</div>
+                                                    <p className="text-gray-100 text-lg leading-relaxed font-medium">
+                                                        {testimonial.text}
+                                                    </p>
+                                                </div>
+
+                                                <div className="flex items-center gap-4 pt-8 mt-4 border-t border-white/10 relative z-10">
+                                                    <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-black shadow-lg bg-unity-saffron">
+                                                        {testimonial.name[0]}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-white font-bold font-display text-base tracking-wide">{testimonial.name}</h4>
+                                                        <p className={`text-xs uppercase tracking-widest font-semibold ${testimonial.color.includes('saffron') ? 'text-unity-saffron' : testimonial.color.includes('emerald') ? 'text-unity-emerald' : 'text-unity-coral'}`}>
+                                                            {testimonial.role}
                                                         </p>
                                                     </div>
-                                                    <div className="flex items-center gap-4 pt-4 border-t border-white/5">
-                                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-black ${testimonial.color.includes('saffron') ? 'bg-unity-saffron' : testimonial.color.includes('emerald') ? 'bg-unity-emerald' : 'bg-unity-coral'}`}>
-                                                            {testimonial.name[0]}
-                                                        </div>
-                                                        <div>
-                                                            <h4 className="text-white font-bold font-display text-sm">{testimonial.name}</h4>
-                                                            <p className={`text-xs uppercase tracking-wider ${testimonial.color.includes('saffron') ? 'text-unity-saffron' : testimonial.color.includes('emerald') ? 'text-unity-emerald' : 'text-unity-coral'}`}>
-                                                                {testimonial.role}
-                                                            </p>
-                                                        </div>
-                                                    </div>
                                                 </div>
-                                            </ElectricBorder>
-                                        </div>
+                                            </div>
+                                        </motion.div>
                                     ))}
                                 </React.Fragment>
                             ))}

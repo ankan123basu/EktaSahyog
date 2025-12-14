@@ -154,7 +154,7 @@ const About = () => {
                 </div>
 
                 {/* Team Section */}
-                <div className="mb-20">
+                <div className="mb-32">
                     <div className="text-center mb-16">
                         <h2 className="text-4xl md:text-5xl font-display text-white mb-4">Meet the <span className="text-unity-emerald">Creators</span></h2>
                         <p className="text-gray-400 text-lg mb-2">The minds behind the mission</p>
@@ -192,6 +192,75 @@ const About = () => {
                             linkedin="https://www.linkedin.com/in/sneha-singh-01b053294/"
                         />
                     </div>
+                </div>
+
+                {/* Legal & Safety Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+                    {/* Guidelines */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                        className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md hover:bg-white/10 transition-all"
+                    >
+                        <div className="w-12 h-12 bg-unity-saffron/20 rounded-xl flex items-center justify-center mb-6">
+                            <BookOpen className="w-6 h-6 text-unity-saffron" />
+                        </div>
+                        <h3 className="text-xl font-display text-white mb-4">Community Guidelines</h3>
+                        <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                            We foster a space of respect and unity. Hate speech, discrimination, or political polarization is strictly prohibited.
+                        </p>
+                        <ul className="text-sm text-gray-400 space-y-2 mb-6">
+                            <li className="flex items-center"><span className="w-1.5 h-1.5 bg-unity-saffron rounded-full mr-2"></span>Respect all cultures</li>
+                            <li className="flex items-center"><span className="w-1.5 h-1.5 bg-unity-saffron rounded-full mr-2"></span>No hate speech</li>
+                            <li className="flex items-center"><span className="w-1.5 h-1.5 bg-unity-saffron rounded-full mr-2"></span>Constructive dialogue only</li>
+                        </ul>
+                    </motion.div>
+
+                    {/* Safety */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2 }}
+                        className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md hover:bg-white/10 transition-all"
+                    >
+                        <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-6">
+                            <Award className="w-6 h-6 text-white" />
+                        </div>
+                        <h3 className="text-xl font-display text-white mb-4">Safety Center</h3>
+                        <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                            Your safety is our priority. We use AI to monitor toxicity and provide tools to report inappropriate behavior instantly.
+                        </p>
+                        <ul className="text-sm text-gray-400 space-y-2 mb-6">
+                            <li className="flex items-center"><span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>AI Toxicity Detection</li>
+                            <li className="flex items-center"><span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>Verified Profiles</li>
+                            <li className="flex items-center"><span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>Secure Reporting</li>
+                        </ul>
+                    </motion.div>
+
+                    {/* Privacy */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3 }}
+                        className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md hover:bg-white/10 transition-all"
+                    >
+                        <div className="w-12 h-12 bg-unity-emerald/20 rounded-xl flex items-center justify-center mb-6">
+                            <Database className="w-6 h-6 text-unity-emerald" />
+                        </div>
+                        <h3 className="text-xl font-display text-white mb-4">Privacy Policy</h3>
+                        <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                            Your data belongs to you. We only store essential info to personalize your experience and never sell your data to third parties.
+                        </p>
+                        <ul className="text-sm text-gray-400 space-y-2 mb-6">
+                            <li className="flex items-center"><span className="w-1.5 h-1.5 bg-unity-emerald rounded-full mr-2"></span>End-to-end Encryption</li>
+                            <li className="flex items-center"><span className="w-1.5 h-1.5 bg-unity-emerald rounded-full mr-2"></span>Data Ownership</li>
+                            <li className="flex items-center"><span className="w-1.5 h-1.5 bg-unity-emerald rounded-full mr-2"></span>Transparent Usage</li>
+                        </ul>
+                    </motion.div>
                 </div>
             </div>
         </div>
