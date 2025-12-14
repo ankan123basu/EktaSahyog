@@ -149,6 +149,7 @@ import hotspotRoutes from './routes/hotspots.js';
 
 import dashboardRoutes from './routes/dashboard.js';
 import newsletterRoutes from './routes/newsletter.js';
+import councilRoutes from './routes/council.js';
 
 // Routes
 app.use('/auth', authRoutes);
@@ -165,6 +166,7 @@ app.use('/games', gameRoutes);
 app.use('/hotspots', hotspotRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/newsletter', newsletterRoutes);
+app.use('/api/council', councilRoutes);
 
 // Chat History Endpoint
 app.get('/chat/history/:room', async (req, res) => {

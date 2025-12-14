@@ -30,7 +30,7 @@ const getMockData = (type) => {
         ],
         culture: [
             { category: 'Festivals', count: 45, engagement: 89 },
-            { category: 'Food', count: 38, engagement: 92 },
+            { category: 'Sweets', count: 38, engagement: 92 },
             { category: 'Art', count: 32, engagement: 78 },
             { category: 'Dance', count: 28, engagement: 85 },
             { category: 'Music', count: 25, engagement: 88 }

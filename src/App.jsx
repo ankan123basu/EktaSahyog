@@ -23,6 +23,7 @@ import RubiksGame from './pages/games/RubiksGame';
 import MokshaPatam from './pages/games/MokshaPatam';
 import Pallanguzhi from './pages/games/Pallanguzhi';
 import Ganjifa from './pages/games/Ganjifa';
+import UnityCouncil from './pages/UnityCouncil';
 import JnanaYatra from './pages/games/JnanaYatra';
 import AaduPuli from './pages/games/AaduPuli';
 import Chakravyuha from './pages/games/Chakravyuha';
@@ -49,6 +50,7 @@ function App() {
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/about" element={<About />} />
+            <Route path="/council" element={<UnityCouncil />} />
 
             {/* Protected Routes */}
             <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />

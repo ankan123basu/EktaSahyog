@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, ShoppingBag } from 'lucide-react';
+import { Menu, X, ShoppingBag, ChevronDown } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import LiquidChrome from '../ui/LiquidChrome';
@@ -55,6 +55,7 @@ const Navbar = () => {
         { name: 'Culture', path: '/culture' },
         { name: 'Games', path: '/games' },
         { name: 'Hotspots', path: '/hotspots' },
+        { name: 'Unity Council', path: '/council' },
         { name: 'Chat', path: '/chat' },
         { name: 'About Us', path: '/about' },
         ...(isAdmin ? [
@@ -89,8 +90,67 @@ const Navbar = () => {
                         </Link>
 
                         {/* Desktop Nav */}
-                        <div className="hidden md:flex items-center space-x-8">
-                            {navLinks.map((link) => (
+                        <div className="hidden md:flex items-center space-x-6">
+                            {/* Standard Links */}
+                            {[
+                                { name: 'Marketplace', path: '/marketplace' },
+                                { name: 'Projects', path: '/projects' },
+                                { name: 'Stories', path: '/stories' },
+                            ].map((link) => (
+                                <Link
+                                    key={link.name}
+                                    to={link.path}
+                                    className={`text-sm font-medium transition-colors duration-300 uppercase tracking-wide whitespace-nowrap ${location.pathname === link.path
+                                        ? 'text-unity-saffron'
+                                        : 'text-gray-300 hover:text-white'
+                                        }`}
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
+
+                            {/* Discover Dropdown */}
+                            <div className="relative group" onMouseEnter={() => setIsOpen(true)} onMouseLeave={() => setIsOpen(false)}>
+                                <button className="flex items-center space-x-1 text-sm font-medium text-gray-300 hover:text-white uppercase tracking-wide transition-colors py-2">
+                                    <span>Discover</span>
+                                    <ChevronDown size={14} className="group-hover:text-unity-saffron transition-colors" />
+                                </button>
+
+                                {/* Dropdown Menu */}
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top">
+                                    <div className="bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl p-2 flex flex-col gap-1">
+                                        {[
+                                            { name: 'Culture Hub', path: '/culture' },
+                                            { name: 'Arcade Games', path: '/games' },
+                                            { name: 'Cultural Hotspots', path: '/hotspots' },
+                                            { name: 'Unity Council', path: '/council' }
+                                        ].map((item) => (
+                                            <Link
+                                                key={item.name}
+                                                to={item.path}
+                                                className={`block px-4 py-2 text-sm rounded-lg transition-colors ${location.pathname === item.path
+                                                    ? 'bg-white/10 text-unity-saffron'
+                                                    : item.highlight
+                                                        ? 'text-unity-saffron hover:bg-unity-saffron/10'
+                                                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                                                    }`}
+                                            >
+                                                {item.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Remaining Links */}
+                            {[
+                                { name: 'Chat', path: '/chat' },
+                                { name: 'About Us', path: '/about' },
+                                ...(isAdmin ? [
+                                    { name: 'Map', path: '/map' },
+                                    { name: 'Dashboard', path: '/dashboard' }
+                                ] : []),
+                            ].map((link) => (
                                 <Link
                                     key={link.name}
                                     to={link.path}

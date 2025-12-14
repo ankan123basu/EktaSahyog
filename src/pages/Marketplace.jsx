@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, Filter, Tag, Plus, ShoppingBag, CheckCircle } from 'lucide-react';
+import { Search, Filter, Tag, Plus, ShoppingBag, CheckCircle, X, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import ProductCard from '../Components/features/ProductCard';
 import AddProductModal from '../Components/features/AddProductModal';
@@ -8,7 +8,7 @@ import ProductDetailsModal from '../Components/features/ProductDetailsModal';
 import { Button } from '../Components/ui/Button';
 import bg1 from '../Images/wmremove-transformed.png';
 
-const CATEGORIES = ["All", "Textiles", "Handicrafts", "Art", "Food", "Decor"];
+const CATEGORIES = ["All", "Textiles", "Handicrafts", "Art", "Sweets", "Decor"];
 
 const Marketplace = () => {
     const [products, setProducts] = useState([]);
@@ -222,7 +222,7 @@ const Marketplace = () => {
                             )}
                             {(purchaseModal.type === 'success' || purchaseModal.type === 'error') && (
                                 <Button variant="primary" onClick={closePurchaseModal} className="w-full">
-                                    {purchaseModal.type === 'success' ? 'View Order' : 'Close'}
+                                    {purchaseModal.type === 'success' ? 'Close' : 'Close'}
                                 </Button>
                             )}
                         </div>

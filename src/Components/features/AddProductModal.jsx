@@ -91,26 +91,26 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
                                 <option>Textiles</option>
                                 <option>Handicrafts</option>
                                 <option>Art</option>
-                                <option>Food</option>
+                                <option>Sweets</option>
                                 <option>Decor</option>
                             </select>
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1">Size (Optional)</label>
+                        <label className="block text-xs text-gray-400 mb-1">Size / Weight (Optional)</label>
                         <input
                             type="text"
                             value={formData.size}
                             onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                            placeholder="e.g., M, L, 10x10 cm"
+                            placeholder="e.g., M, L, 1 kg, 500g, 10x10 cm"
                             className="w-full bg-black/20 border border-white/10 p-2 text-white focus:border-unity-saffron focus:outline-none"
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1">Artisan Name</label>
+                            <label className="block text-xs text-gray-400 mb-1">Brand / Artisan Name</label>
                             <input
                                 type="text"
                                 value={formData.artisan}
