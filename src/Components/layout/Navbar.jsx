@@ -123,7 +123,8 @@ const Navbar = () => {
                                             { name: 'Culture Hub', path: '/culture' },
                                             { name: 'Arcade Games', path: '/games' },
                                             { name: 'Cultural Hotspots', path: '/hotspots' },
-                                            { name: 'Unity Council', path: '/council' }
+                                            { name: 'Unity Council', path: '/council' },
+                                            { name: 'Metaverse (Beta)', path: '/metaverse' }
                                         ].map((item) => (
                                             <Link
                                                 key={item.name}

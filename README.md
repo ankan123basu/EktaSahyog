@@ -50,6 +50,19 @@ EktaSahyog introduces the **"Dual-Reality Engine"**, a design philosophy that bl
 ### 6. Interactive Map 🗺️
 *   Visualizes cultural hotspots, active projects, and artisan locations across the Indian subcontinent.
 
+### 7. Global Unity Council (New!) 🏛️
+*   **Time-Travel Dialogue**: A novel "Soul Script" engine that lets you hold real-time debates with India's founding fathers and mothers.
+*   **The "Soul Script" Technology**: Unlike generic chatbots, each persona (like **Sardar Patel**, **Rabindranath Tagore**, or **Dr. APJ Abdul Kalam**) runs on a specialized system prompt that enforces strict historical accuracy, speech patterns (e.g., Urdu-infused English for Maulana Azad, fiery energy for Swami Vivekananda), and specific "Unity Values".
+*   **Real-time Wisdom**: Powered by **Llama-3.1 on Groq**, providing sub-second responses that feel like a live conversation with history.
+
+### 8. The Metaverse Bazaar (Beta) 🎆
+*   **Immersive 3D Commerce**: A fully navigable 3D world built with **React Three Fiber** where you walk as a player, approach stylized village stalls, and buy real products.
+*   **Atmospheric "Game Juice"**:
+    *   **Sky Lanterns Engine**: A custom `InstancedMesh` system rendering hundreds of glowing paper lanterns rising into the night sky, simulating a digital Diwali festival.
+    *   **Smart Interaction Logic**: Features a custom "Safety Trigger" (Debounce Mechanism) that intuitively distinguishes between "looking around" and "clicking to buy," solving common 3D web-game UX frustrations.
+    *   **Confetti Rewards**: Instant visual celebration upon purchase using canvas-based particle physics.
+
+
 ---
 
 ## 🛠️ Tech Stack
@@ -60,6 +73,13 @@ EktaSahyog introduces the **"Dual-Reality Engine"**, a design philosophy that bl
 *   **Animations**: Framer Motion
 *   **Data Visualization**: Recharts
 *   **Icons**: Lucide React
+
+### Metaverse (3D Engine)
+*   **Core**: React Three Fiber (`@react-three/fiber`)
+*   **Helpers**: Zwei (`@react-three/drei`) - for Clouds, Stars, Sparkles, and Text.
+*   **Physics/Math**: Three.js (Vector Math for movement)
+*   **Effects**: `canvas-confetti` (Particle System)
+
 
 ### Backend
 *   **Runtime**: Node.js

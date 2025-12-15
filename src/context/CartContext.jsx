@@ -5,7 +5,18 @@ const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-    const getUserId = () => localStorage.getItem('userId') || 'guest';
+    const getUserId = () => {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                return user._id || user.id || 'guest';
+            } catch (e) {
+                return 'guest';
+            }
+        }
+        return 'guest';
+    };
 
     const [cartItems, setCartItems] = useState(() => {
         const userId = getUserId();

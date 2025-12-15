@@ -129,7 +129,7 @@ const Footer = () => {
                 {/* Bottom Bar */}
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-gray-500 text-sm">
-                        © 2024 EktaSahyog. Made with <Heart className="w-4 h-4 text-unity-coral inline mx-1 animate-pulse" /> for India.
+                        © 2025 EktaSahyog. Made with <Heart className="w-4 h-4 text-unity-coral inline mx-1 animate-pulse" /> for India.
                     </p>
                     <div className="flex space-x-6 text-sm text-gray-500">
                         <Link to="/about" className="hover:text-white transition-colors">Privacy Policy</Link>

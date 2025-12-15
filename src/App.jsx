@@ -27,6 +27,7 @@ import UnityCouncil from './pages/UnityCouncil';
 import JnanaYatra from './pages/games/JnanaYatra';
 import AaduPuli from './pages/games/AaduPuli';
 import Chakravyuha from './pages/games/Chakravyuha';
+import Metaverse from './pages/Metaverse';
 
 import Cursor from './Components/ui/Cursor';
 import SplashCursor from './Components/ui/SplashCursor';
@@ -72,6 +73,9 @@ function App() {
             <Route path="/games/quiz" element={<ProtectedRoute><JnanaYatra /></ProtectedRoute>} />
             <Route path="/games/aadupuli" element={<ProtectedRoute><AaduPuli /></ProtectedRoute>} />
             <Route path="/games/chakravyuha" element={<ProtectedRoute><Chakravyuha /></ProtectedRoute>} />
+
+            {/* Metaverse - Public Route for now or Protected? Let's make it protected */}
+            <Route path="/metaverse" element={<ProtectedRoute><Metaverse /></ProtectedRoute>} />
           </Routes>
         </div>
         <Footer />
