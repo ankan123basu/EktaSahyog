@@ -175,8 +175,10 @@ EktaSahyog/
 ## 👥 Made By
 
 **Team EktaSahyog**  
-*Lead Developer*: Ankan  
-*Mission*: To unite India, one pixel at a time.
+
+Team members: Ankan Basu , Sachin Burnwal , Sneha Singh
+
+*Mission*: " To unite India, one pixel at a time." 
 
 ---
 
