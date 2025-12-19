@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text, Html, Float, Billboard } from '@react-three/drei';
+import { Text, Html, Float, Billboard, SpotLight } from '@react-three/drei';
 import * as THREE from 'three';
 import Rangoli from './Rangoli';
 
@@ -52,6 +52,7 @@ const Stall = ({ position, product, onClick, hideOverlay }) => {
     const groupRef = useRef();
     const shopkeeperRef = useRef();
     const headRef = useRef();
+    const spotlightRef = useRef();
 
     const colors = useMemo(() => {
         // Use a better hash for valid IDs, or falling back to random
@@ -84,6 +85,10 @@ const Stall = ({ position, product, onClick, hideOverlay }) => {
         if (headRef.current) {
             headRef.current.lookAt(state.camera.position);
         }
+        // Dynamic Spotlight Intensity
+        if (spotlightRef.current) {
+            spotlightRef.current.intensity = THREE.MathUtils.lerp(spotlightRef.current.intensity, hovered ? 15 : 0, 0.1);
+        }
     });
 
     return (
@@ -96,6 +101,9 @@ const Stall = ({ position, product, onClick, hideOverlay }) => {
         >
             {/* --- RANGOLI (Culture Detail) --- */}
             <Rangoli position={[0, 0, 0]} />
+
+            {/* Dramatic Spotlight that turns on when hovering */}
+            <SpotLight ref={spotlightRef} position={[0, 6, 2]} angle={0.4} penumbra={0.5} castShadow distance={10} color="#FFD700" />
 
             {/* --- SHOPKEEPER --- */}
             <group ref={shopkeeperRef} position={[1.8, 1.5, 0]}>

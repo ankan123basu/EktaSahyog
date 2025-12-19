@@ -262,28 +262,52 @@ const UnityCouncil = () => {
 
         const utterance = new SpeechSynthesisUtterance(text);
 
-        // Try to find an Indian English voice
-        const voices = window.speechSynthesis.getVoices();
+        // Get voices (retry logic isn't here, assuming loaded)
+        let voices = window.speechSynthesis.getVoices();
+
+        // Debugging: useful to see what's actually available
+        console.log("Available Voices:", voices.map(v => v.name));
 
         // Smart Voice Selection: Try to match Gender if possible
         const isFemale = selectedPersona && ['laxmibai', 'naidu'].includes(selectedPersona.id);
 
-        let targetVoice = voices.find(v =>
-            (v.lang.includes('IN') || v.name.includes('India')) &&
-            (isFemale ? (v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Heera')) : (v.name.includes('Male') || v.name.includes('Ravi') || v.name.includes('David')))
-        );
+        let targetVoice = null;
 
-        // Fallback to any Indian voice
+        if (isFemale) {
+            // Priority 1: Indian Female (Heera, Kalpana, Rani)
+            targetVoice = voices.find(v =>
+                (v.lang.includes('IN') || v.name.includes('India') || v.name.includes('Hindi')) &&
+                (v.name.includes('Female') || v.name.includes('Heera') || v.name.includes('Kalpana') || v.name.includes('Rani'))
+            );
+
+            // Priority 2: Specific Known Female Voices (Windows/Mac/Chrome)
+            if (!targetVoice) targetVoice = voices.find(v => v.name.includes('Microsoft Zira')); // Windows
+            if (!targetVoice) targetVoice = voices.find(v => v.name.includes('Google US English')); // Chrome (Female)
+            if (!targetVoice) targetVoice = voices.find(v => v.name.includes('Samantha')); // Mac
+            if (!targetVoice) targetVoice = voices.find(v => v.name.includes('Victoria')); // Mac
+
+            // Priority 3: Generic "Female" check
+            if (!targetVoice) targetVoice = voices.find(v => v.name.toLowerCase().includes('female'));
+        } else {
+            // Male priorities
+            targetVoice = voices.find(v =>
+                (v.lang.includes('IN') || v.name.includes('India')) &&
+                (v.name.includes('Male') || v.name.includes('Ravi') || v.name.includes('David'))
+            );
+        }
+
+        // Fallback 1: Any Indian Voice (if gender match failed but we want accent)
         if (!targetVoice) {
             targetVoice = voices.find(v => v.lang.includes('IN') || v.name.includes('India'));
         }
 
-        // Fallback to any English voice
+        // Fallback 2: Any English Voice
         if (!targetVoice) {
             targetVoice = voices.find(v => v.lang.includes('en'));
         }
 
         if (targetVoice) {
+            console.log("Selected Voice:", targetVoice.name);
             utterance.voice = targetVoice;
 
             // --- VOICE PERSONALIZATION (Simulating Legends) ---
@@ -294,7 +318,7 @@ const UnityCouncil = () => {
                 } else if (['tagore', 'vivekananda'].includes(selectedPersona.id)) {
                     utterance.pitch = 0.8; // Calm, philosophical
                     utterance.rate = 0.8; // Slow, poetic
-                } else if (['laxmibai', 'naidu'].includes(selectedPersona.id)) {
+                } else if (isFemale) {
                     utterance.pitch = 1.1; // Higher pitch
                     utterance.rate = 1.0;
                 } else if (selectedPersona.id === 'kalam') {

@@ -11,6 +11,72 @@ import { LogOut } from 'lucide-react';
 import * as THREE from 'three';
 import confetti from 'canvas-confetti';
 
+// --- 1. NEW: PROCEDURAL TREE (Low Poly Art Style) ---
+function Tree({ position }) {
+    return (
+        <group position={position}>
+            {/* Trunk */}
+            <mesh position={[0, 1.5, 0]}>
+                <cylinderGeometry args={[0.3, 0.5, 3, 6]} />
+                <meshStandardMaterial color="#5D4037" />
+            </mesh>
+            {/* Leaves (Stacked Cones) */}
+            <mesh position={[0, 3.5, 0]}>
+                <coneGeometry args={[2, 2.5, 6]} />
+                <meshStandardMaterial color="#2E7D32" />
+            </mesh>
+            <mesh position={[0, 4.8, 0]}>
+                <coneGeometry args={[1.5, 2, 6]} />
+                <meshStandardMaterial color="#388E3C" />
+            </mesh>
+            <mesh position={[0, 5.8, 0]}>
+                <coneGeometry args={[1, 1.5, 6]} />
+                <meshStandardMaterial color="#4CAF50" />
+            </mesh>
+        </group>
+    );
+}
+
+// --- 2. NEW: FLOWER PETAL RAIN (Marigolds) ---
+function FlowerRain() {
+    const count = 150;
+    const mesh = useRef();
+
+    const particles = useMemo(() => {
+        return new Array(count).fill(0).map(() => ({
+            pos: new THREE.Vector3((Math.random() - 0.5) * 100, Math.random() * 40, (Math.random() - 0.5) * 100),
+            vel: Math.random() * 0.1 + 0.05,
+            rot: Math.random() * Math.PI,
+            color: Math.random() > 0.5 ? "#FFA500" : "#FFD700" // Orange or Gold
+        }));
+    }, []);
+
+    const dummy = useMemo(() => new THREE.Object3D(), []);
+
+    useFrame(() => {
+        particles.forEach((p, i) => {
+            p.pos.y -= p.vel;
+            p.rot += 0.02;
+            if (p.pos.y < 0) p.pos.y = 40; // Reset to top
+
+            dummy.position.copy(p.pos);
+            dummy.rotation.set(p.rot, p.rot, 0);
+            dummy.scale.set(0.3, 0.3, 0.3);
+            dummy.updateMatrix();
+            mesh.current.setMatrixAt(i, dummy.matrix);
+            // We can't easily change color per instance without custom shader, so we stick to geometry color
+        });
+        mesh.current.instanceMatrix.needsUpdate = true;
+    });
+
+    return (
+        <instancedMesh ref={mesh} args={[null, null, count]}>
+            <planeGeometry args={[0.5, 0.5]} />
+            <meshStandardMaterial color="#FFA500" side={THREE.DoubleSide} transparent opacity={0.8} />
+        </instancedMesh>
+    );
+}
+
 // --- NEW: RISING SKY LANTERNS ---
 function SkyLanterns() {
     const count = 100;
@@ -106,6 +172,8 @@ function Player({ isLocked }) {
     const sideVector = useRef(new THREE.Vector3());
 
     const [move, setMove] = useState({ forward: false, backward: false, left: false, right: false });
+    // Dust Particles Ref
+    const dustRef = useRef();
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -132,48 +200,100 @@ function Player({ isLocked }) {
         };
     }, []);
 
-    useFrame(() => {
+    useFrame((state) => {
         if (!isLocked) return;
         frontVector.current.set(0, 0, Number(move.backward) - Number(move.forward));
         sideVector.current.set(Number(move.left) - Number(move.right), 0, 0);
         direction.current.subVectors(frontVector.current, sideVector.current).normalize().multiplyScalar(moveSpeed).applyEuler(camera.rotation);
         camera.position.add(direction.current);
-        camera.position.y = 1.7;
+
+        const isMoving = move.forward || move.backward || move.left || move.right;
+
+        // Head Bob
+        if (isMoving) {
+            camera.position.y = 1.7 + Math.sin(state.clock.elapsedTime * 10) * 0.05;
+            // Move dust with player
+            if (dustRef.current) {
+                dustRef.current.position.set(camera.position.x, 0, camera.position.z);
+                dustRef.current.visible = true;
+            }
+        } else {
+            camera.position.y = THREE.MathUtils.lerp(camera.position.y, 1.7, 0.1);
+            if (dustRef.current) dustRef.current.visible = false;
+        }
     });
-    return null;
+    return (
+        <group ref={dustRef}>
+            <Sparkles count={20} scale={2} size={6} speed={2} opacity={0.5} color="#8B4513" position={[0, 0.1, 0]} />
+        </group>
+    );
 }
 
-const Visitor = ({ position, color }) => {
-    const ref = useRef();
-    const headRef = useRef();
-    const offset = useMemo(() => Math.random() * 100, []);
+// --- 1. NEW: WALKING AI VISITOR ---
+// --- 3. UPGRADED: VISITOR WITH CHAT BUBBLES ---
+function WalkingVisitor({ color, startPos }) {
+    const group = useRef();
+    const [target, setTarget] = useState(new THREE.Vector3(startPos[0], 0, startPos[2]));
+    const [isWaiting, setIsWaiting] = useState(false);
+    const [chat, setChat] = useState("");
 
-    useFrame((state) => {
-        const t = state.clock.getElapsedTime() + offset;
-        if (ref.current) {
-            ref.current.rotation.y = Math.sin(t * 0.5) * 0.2;
-            ref.current.rotation.z = Math.sin(t * 1) * 0.05;
-        }
-        if (headRef.current) {
-            headRef.current.rotation.y = Math.sin(t * 0.3) * 0.5;
+    // Random "Gossip" dialogues
+    const dialogues = [
+        "Wow, look at that!", "So beautiful...", "I need some chai.",
+        "Great price!", "Where is my friend?", "Pure heritage art.",
+        "Lovely evening!", "Let's buy this.", "Namaste!"
+    ];
+
+    useEffect(() => {
+        // Randomly talk every 5-10 seconds
+        const interval = setInterval(() => {
+            if (Math.random() > 0.7) { // 30% chance to talk
+                setChat(dialogues[Math.floor(Math.random() * dialogues.length)]);
+                // Hide chat after 3 seconds
+                setTimeout(() => setChat(""), 3000);
+            }
+        }, 4000);
+        return () => clearInterval(interval);
+    }, []);
+
+    useFrame((state, delta) => {
+        if (!group.current) return;
+        if (isWaiting) return;
+
+        const currentPos = group.current.position;
+        if (currentPos.distanceTo(target) < 1) {
+            setIsWaiting(true);
+            setTimeout(() => {
+                const x = (Math.random() - 0.5) * 60;
+                const z = (Math.random() - 0.5) * 40 - 10;
+                setTarget(new THREE.Vector3(x, 0, z));
+                setIsWaiting(false);
+            }, 3000 + Math.random() * 2000);
+        } else {
+            const dir = new THREE.Vector3().subVectors(target, currentPos).normalize();
+            group.current.position.add(dir.multiplyScalar(2 * delta));
+            group.current.lookAt(target.x, group.current.position.y, target.z);
         }
     });
 
     return (
-        <group ref={ref} position={position}>
-            <mesh position={[0, 0.75, 0]}>
-                <cylinderGeometry args={[0.3, 0.4, 1.5]} />
-                <meshStandardMaterial color={color} />
-            </mesh>
-            <group ref={headRef} position={[0, 1.6, 0]}>
-                <mesh>
-                    <sphereGeometry args={[0.25, 16, 16]} />
-                    <meshStandardMaterial color="#8D5524" />
-                </mesh>
-            </group>
+        <group ref={group} position={startPos}>
+            {/* Chat Bubble */}
+            {chat && (
+                <Html position={[0, 2.5, 0]} center>
+                    <div className="bg-white px-3 py-1 rounded-2xl shadow-lg border border-gray-200 text-xs font-bold text-gray-800 whitespace-nowrap animate-bounce">
+                        {chat}
+                    </div>
+                </Html>
+            )}
+
+            <mesh position={[0, 0.75, 0]}><cylinderGeometry args={[0.3, 0.4, 1.5]} /><meshStandardMaterial color={color} /></mesh>
+            <mesh position={[0, 1.6, 0]}><sphereGeometry args={[0.25]} /><meshStandardMaterial color="#8D5524" /></mesh>
+            <mesh position={[-0.2, 0.2, 0]} rotation={[0, 0, 0.1]}><cylinderGeometry args={[0.1, 0.1, 0.8]} /><meshStandardMaterial color="#333" /></mesh>
+            <mesh position={[0.2, 0.2, 0]} rotation={[0, 0, -0.1]}><cylinderGeometry args={[0.1, 0.1, 0.8]} /><meshStandardMaterial color="#333" /></mesh>
         </group>
     );
-};
+}
 
 // --- GIANT WHEEL ---
 function GiantWheel() {
@@ -293,19 +413,23 @@ const Metaverse = () => {
         fetchProducts();
     }, []);
 
-    const visitors = useMemo(() => {
-        const temp = [];
-        for (let i = 0; i < 10; i++) {
-            const x = (Math.random() - 0.5) * 40;
-            const z = (Math.random() - 0.5) * 30 - 15;
-            const colors = ["#E91E63", "#9C27B0", "#2196F3", "#4CAF50", "#FF9800"];
-            temp.push({
-                pos: [x, 0, z],
-                color: colors[Math.floor(Math.random() * colors.length)]
-            });
+    // Generate trees around the border
+    const trees = useMemo(() => {
+        const t = [];
+        for (let i = 0; i < 30; i++) {
+            // Place trees far away in a ring
+            const angle = (i / 30) * Math.PI * 2;
+            const r = 40 + Math.random() * 20;
+            t.push([Math.cos(angle) * r, 0, Math.sin(angle) * r]);
         }
-        return temp;
+        return t;
     }, []);
+
+    // Generate AI Visitors with random start positions
+    const visitors = useMemo(() => new Array(8).fill(0).map(() => ({
+        startPos: [(Math.random() - 0.5) * 40, 0, (Math.random() - 0.5) * 30 - 10],
+        color: ["#E91E63", "#9C27B0", "#2196F3"][Math.floor(Math.random() * 3)]
+    })), []);
 
     const grassRangolis = useMemo(() => {
         const temp = [];
@@ -395,6 +519,7 @@ const Metaverse = () => {
 
                     {/* --- NEW: SKY LANTERNS --- */}
                     <SkyLanterns />
+                    <FlowerRain /> {/* NEW: Marigold Petals */}
 
                     <Firework position={[-20, 15, -30]} color="red" />
                     <Firework position={[0, 20, -40]} color="gold" />
@@ -405,11 +530,15 @@ const Metaverse = () => {
                         <meshStandardMaterial color="#355e22" roughness={0.8} />
                     </mesh>
 
+                    {/* PROCEDURAL TREES */}
+                    {trees.map((pos, i) => <Tree key={i} position={pos} />)}
+
                     <VillageBanner />
                     <GiantWheel />
 
+                    {/* AI WALKING VISITORS */}
                     {visitors.map((v, i) => (
-                        <Visitor key={i} position={v.pos} color={v.color} />
+                        <WalkingVisitor key={i} startPos={v.startPos} color={v.color} />
                     ))}
 
                     {grassRangolis.map((g, i) => (
