@@ -12,7 +12,7 @@ export function TubeLight({ position }) {
                 <cylinderGeometry args={[0.05, 0.05, 2.8]} />
                 <meshStandardMaterial color="#E0FFFF" emissive="#E0FFFF" emissiveIntensity={8} toneMapped={false} />
             </mesh>
-            <pointLight intensity={6} distance={12} color="#E0FFFF" decay={1.5} />
+            {/* Removed expensive PointLight, relying on emissive glow */}
         </group>
     );
 }
@@ -40,7 +40,7 @@ function TuniLights() {
                 <mesh key={i} position={l.pos}>
                     <sphereGeometry args={[0.08, 8, 8]} />
                     <meshStandardMaterial color={l.color} emissive={l.color} emissiveIntensity={5} toneMapped={false} />
-                    <pointLight distance={3} intensity={2} color={l.color} decay={2} />
+                    {/* Removed expensive PointLight array */}
                 </mesh>
             ))}
         </group>
@@ -85,10 +85,6 @@ const Stall = ({ position, product, onClick, hideOverlay }) => {
         if (headRef.current) {
             headRef.current.lookAt(state.camera.position);
         }
-        // Dynamic Spotlight Intensity
-        if (spotlightRef.current) {
-            spotlightRef.current.intensity = THREE.MathUtils.lerp(spotlightRef.current.intensity, hovered ? 15 : 0, 0.1);
-        }
     });
 
     return (
@@ -102,8 +98,10 @@ const Stall = ({ position, product, onClick, hideOverlay }) => {
             {/* --- RANGOLI (Culture Detail) --- */}
             <Rangoli position={[0, 0, 0]} />
 
-            {/* Dramatic Spotlight that turns on when hovering */}
-            <SpotLight ref={spotlightRef} position={[0, 6, 2]} angle={0.4} penumbra={0.5} castShadow distance={10} color="#FFD700" />
+            {/* Dramatic Spotlight that turns on ONLY when hovering to save GPU Uniforms */}
+            {hovered && (
+                <SpotLight position={[0, 6, 2]} angle={0.4} penumbra={0.5} castShadow distance={10} color="#FFD700" intensity={15} />
+            )}
 
             {/* --- SHOPKEEPER --- */}
             <group ref={shopkeeperRef} position={[1.8, 1.5, 0]}>
@@ -127,16 +125,16 @@ const Stall = ({ position, product, onClick, hideOverlay }) => {
                 </mesh>
             </group>
 
-            {/* --- HUT STRUCTURE --- */}
+            {/* --- HUT STRUCTURE with Emissive for visibility --- */}
             <mesh position={[0, 0.05, 0]}>
                 <cylinderGeometry args={[2.5, 2.8, 0.3, 8]} />
-                <meshStandardMaterial color="#5C4033" roughness={1} />
+                <meshStandardMaterial color="#5C4033" roughness={1} emissive="#5C4033" emissiveIntensity={0.2} />
             </mesh>
 
             {[[-1.2, 0.8], [1.2, 0.8], [-1.2, -0.8], [1.2, -0.8]].map((pos, i) => (
                 <mesh key={i} position={[pos[0], 2, pos[1]]}>
                     <cylinderGeometry args={[0.08, 0.08, 4]} />
-                    <meshStandardMaterial color="#3E2723" />
+                    <meshStandardMaterial color="#3E2723" emissive="#3E2723" emissiveIntensity={0.2} />
                 </mesh>
             ))}
 

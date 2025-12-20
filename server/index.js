@@ -15,6 +15,22 @@ dotenv.config();
 import passport from 'passport';
 import './config/passport.js';
 
+// --- GLOBAL ERROR HANDLERS (Prevent Crash on Email/Socket Errors) ---
+process.on('uncaughtException', (err) => {
+    console.error('UNCAUGHT EXCEPTION! 💥');
+    console.error(err.name, err.message);
+    if (err.code === 'ECONNRESET') {
+        console.log('Ignored ECONNRESET from Email/Socket');
+        return;
+    }
+});
+
+process.on('unhandledRejection', (err) => {
+    console.error('UNHANDLED REJECTION! 💥');
+    console.error(err.name, err.message);
+});
+
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {

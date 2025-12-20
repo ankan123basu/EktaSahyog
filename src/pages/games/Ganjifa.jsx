@@ -150,26 +150,27 @@ const Ganjifa = () => {
                 {cards.map((card, index) => {
                     const isFlipped = flipped.includes(index) || matched.includes(index);
                     return (
-                        <motion.div
+                        <div
                             key={index}
-                            className={`aspect-[3/4] rounded-lg cursor-pointer transform transition-all duration-300 perspective-1000 ${isFlipped ? 'rotate-y-180' : ''}`}
+                            className="aspect-[3/4] rounded-lg cursor-pointer perspective-1000 group"
                             onClick={() => handleCardClick(index)}
                         >
-                            <div className={`w-full h-full rounded-lg border-2 shadow-xl flex items-center justify-center text-4xl backface-hidden transition-all duration-500 
-                                ${isFlipped
-                                    ? 'bg-unity-saffron border-yellow-300 rotate-y-180'
-                                    : 'bg-gradient-to-br from-red-800 to-black border-red-900'}
+                            <div className={`
+                                relative w-full h-full transition-all duration-500 preserve-3d
+                                ${isFlipped ? 'rotate-y-180' : ''}
                             `}>
-                                {isFlipped ? (
-                                    <div className="text-center">
-                                        <div>{card.content}</div>
-                                        <div className="text-xs font-bold text-black mt-2">{card.label}</div>
-                                    </div>
-                                ) : (
+                                {/* Front Face (The Content - Hidden Initially, becomes visible on flip) */}
+                                <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-lg border-2 border-yellow-300 bg-unity-saffron shadow-xl flex flex-col items-center justify-center text-center p-2">
+                                    <div className="text-4xl">{card.content}</div>
+                                    <div className="text-xs font-bold text-black mt-2">{card.label}</div>
+                                </div>
+
+                                {/* Back Face (The Card Back - Visible Initially) */}
+                                <div className="absolute inset-0 w-full h-full backface-hidden rounded-lg border-2 border-red-900 bg-gradient-to-br from-red-800 to-black shadow-xl flex items-center justify-center">
                                     <div className="text-white/20 text-2xl font-serif">♠</div>
-                                )}
+                                </div>
                             </div>
-                        </motion.div>
+                        </div>
                     );
                 })}
             </div>

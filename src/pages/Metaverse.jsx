@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import * as THREE from 'three';
 import confetti from 'canvas-confetti';
+import BalloonShooter from '../Components/metaverse/BalloonShooter';
 
 // --- 1. NEW: PROCEDURAL TREE (Low Poly Art Style) ---
 function Tree({ position }) {
@@ -461,12 +462,13 @@ const Metaverse = () => {
         const row = Math.floor(index / perRow);
         const col = index % perRow;
         const x = (col * spacing) - ((perRow * spacing) / 2) + spacing / 2 + (row % 2 === 0 ? 0 : 7);
-        const z = (row * spacing) * -1 - 12;
+        const z = (row * spacing) * -1 - 25; // Pushed back to -25 to clear space for Banner
         return [x, 0, z];
     };
 
     return (
         <div className="fixed inset-0 z-[100] w-full h-screen bg-[#2a1b3e] font-sans">
+
 
             {/* EXIT BUTTON */}
             <div className="absolute top-8 right-8 z-[60] pointer-events-auto">
@@ -533,13 +535,20 @@ const Metaverse = () => {
                     {/* PROCEDURAL TREES */}
                     {trees.map((pos, i) => <Tree key={i} position={pos} />)}
 
-                    <VillageBanner />
+                    {/* BANNER (Moved Front to create Entrance Plaza) */}
+                    <group position={[0, 0, -2]}>
+                        <VillageBanner />
+                    </group>
+
                     <GiantWheel />
 
                     {/* AI WALKING VISITORS */}
                     {visitors.map((v, i) => (
                         <WalkingVisitor key={i} startPos={v.startPos} color={v.color} />
                     ))}
+
+                    {/* --- BALLOON SHOOTING GAME (Moved Beside Banner) --- */}
+                    <BalloonShooter position={[16, 0, -2]} />
 
                     {grassRangolis.map((g, i) => (
                         <Rangoli key={`g-${i}`} position={g.pos} scale={g.scale} seed={g.seed} />

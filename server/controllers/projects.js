@@ -1,7 +1,7 @@
 import Project from '../models/Project.js';
 import User from '../models/User.js'; // Import User model
-import nodemailer from 'nodemailer';
 import Stripe from 'stripe';
+import { sendEmail } from '../services/email.js'; // Import centralized service
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -57,21 +57,12 @@ export const joinProject = async (req, res) => {
             project.members.push(userId);
             await project.save();
 
-            // Send Confirmation Email
-            try {
-                const transporter = nodemailer.createTransport({
-                    service: 'gmail', // or your preferred service
-                    auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS
-                    }
-                });
-
-                const mailOptions = {
-                    from: process.env.EMAIL_USER,
-                    to: user.email,
-                    subject: `Welcome to the Team! - ${project.title}`,
-                    html: `
+            // Send Confirmation Email using centralized service
+            await sendEmail({
+                from: process.env.EMAIL_USER,
+                to: user.email,
+                subject: `Welcome to the Team! - ${project.title}`,
+                html: `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -166,13 +157,7 @@ export const joinProject = async (req, res) => {
 </body>
 </html>
 `
-                };
-
-                await transporter.sendMail(mailOptions);
-            } catch (emailErr) {
-                console.error("Email sending failed:", emailErr);
-                // Don't fail the request if email fails, just log it
-            }
+            });
         }
 
         res.status(200).json(project);
@@ -197,21 +182,12 @@ export const leaveProject = async (req, res) => {
         project.members = project.members.filter(memberId => memberId.toString() !== userId);
         await project.save();
 
-        // Send Cancellation Email
-        try {
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS
-                }
-            });
-
-            const mailOptions = {
-                from: `"EktaSahyog - Unity Projects" <${process.env.EMAIL_USER}>`,
-                to: user.email,
-                subject: `📋 Participation Cancelled - "${project.title}"`,
-                html: `
+        // Send Cancellation Email using centralized service
+        await sendEmail({
+            from: `"EktaSahyog - Unity Projects" <${process.env.EMAIL_USER}>`,
+            to: user.email,
+            subject: `📋 Participation Cancelled - "${project.title}"`,
+            html: `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -281,14 +257,7 @@ export const leaveProject = async (req, res) => {
 </body>
 </html>
 `
-            };
-
-
-
-            await transporter.sendMail(mailOptions);
-        } catch (emailErr) {
-            console.error("Email sending failed:", emailErr);
-        }
+        });
 
         res.status(200).json(project);
     } catch (err) {

@@ -192,7 +192,7 @@ const Auth = () => {
     };
 
     return (
-        <div className="min-h-screen relative bg-unity-dark">
+        <div className="min-h-screen relative bg-unity-dark overflow-x-hidden">
             {/* Fixed Background Elements */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
                 <div className="absolute inset-0 opacity-60">
@@ -207,7 +207,7 @@ const Auth = () => {
             </div>
 
             {/* Scrollable Content Container */}
-            <div className="min-h-screen flex items-center justify-center px-4 pt-32 pb-20 relative z-10 overflow-y-auto">
+            <div className="min-h-screen flex items-center justify-center px-4 pt-32 pb-20 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}

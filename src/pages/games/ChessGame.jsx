@@ -32,64 +32,183 @@ const ChessGame = () => {
     const isWhite = (piece) => '♙♖♘♗♕♔'.includes(piece);
     const isBlack = (piece) => '♟♜♞♝♛♚'.includes(piece);
 
-    // Simplified Valid Move Logic
-    const isValidMove = (startR, startC, endR, endC, piece) => {
+    // Helper to check if path is clear for sliding pieces
+    const isPathBlocked = (startR, startC, endR, endC, currentBoard) => {
+        const dr = Math.sign(endR - startR);
+        const dc = Math.sign(endC - startC);
+
+        let r = startR + dr;
+        let c = startC + dc;
+
+        while (r !== endR || c !== endC) {
+            if (currentBoard[r][c] !== '') return true; // Path blocked
+            r += dr;
+            c += dc;
+        }
+        return false;
+    };
+
+    // Robust Valid Move Logic
+    const isValidMove = (startR, startC, endR, endC, piece, currentBoard = board) => {
         const dx = Math.abs(endC - startC);
         const dy = Math.abs(endR - startR);
-        const target = board[endR][endC];
+        const target = currentBoard[endR][endC];
 
-        // Cannot capture own piece
+        // 1. Cannot capture own piece
         if (target && isWhite(target) === isWhite(piece)) return false;
 
         const type = piece.charCodeAt(0);
 
-        // Pawn (9817 White, 9823 Black)
+        // 2. Pawn Logic (Strict)
         if (type === 9817) { // White Pawn
-            // Move forward 1
+            // Move forward 1 (non-capture)
             if (dx === 0 && endR === startR - 1 && !target) return true;
-            // Move forward 2 (first move)
-            if (dx === 0 && endR === startR - 2 && startR === 6 && !target && !board[startR - 1][startC]) return true;
+            // Move forward 2 (first move, non-capture, path clear)
+            if (dx === 0 && endR === startR - 2 && startR === 6 && !target && !currentBoard[startR - 1][startC]) return true;
             // Capture diagonal
             if (dx === 1 && endR === startR - 1 && target) return true;
             return false;
         }
         if (type === 9823) { // Black Pawn
-            // Move forward 1
+            // Move forward 1 (non-capture)
             if (dx === 0 && endR === startR + 1 && !target) return true;
-            // Move forward 2
-            if (dx === 0 && endR === startR + 2 && startR === 1 && !target && !board[startR + 1][startC]) return true;
+            // Move forward 2 (first move, non-capture, path clear)
+            if (dx === 0 && endR === startR + 2 && startR === 1 && !target && !currentBoard[startR + 1][startC]) return true;
             // Capture diagonal
             if (dx === 1 && endR === startR + 1 && target) return true;
             return false;
         }
 
-        // Rook (9814, 9820) - Straight lines
+        // 3. Sliding Pieces (Rook, Bishop, Queen) - Check Path
+        // Rook
         if (type === 9814 || type === 9820) {
-            if (dx !== 0 && dy !== 0) return false;
+            if (dx !== 0 && dy !== 0) return false; // Must be straight
+            if (isPathBlocked(startR, startC, endR, endC, currentBoard)) return false;
             return true;
         }
 
-        // Knight (9816, 9822) - L shape
+        // Bishop
+        if (type === 9815 || type === 9821) {
+            if (dx !== dy) return false; // Must be diagonal
+            if (isPathBlocked(startR, startC, endR, endC, currentBoard)) return false;
+            return true;
+        }
+
+        // Queen
+        if (type === 9813 || type === 9819) {
+            if ((dx !== dy) && (dx !== 0 && dy !== 0)) return false; // Must be straight or diagonal
+            if (isPathBlocked(startR, startC, endR, endC, currentBoard)) return false;
+            return true;
+        }
+
+        // 4. Knight (Jumps allowed)
         if (type === 9816 || type === 9822) {
             return (dx === 1 && dy === 2) || (dx === 2 && dy === 1);
         }
 
-        // Bishop (9815, 9821) - Diagonals
-        if (type === 9815 || type === 9821) {
-            return dx === dy;
-        }
-
-        // Queen (9813, 9819) - Rook + Bishop
-        if (type === 9813 || type === 9819) {
-            return dx === dy || dx === 0 || dy === 0;
-        }
-
-        // King (9812, 9818) - 1 step any direction
+        // 5. King
         if (type === 9812 || type === 9818) {
             return dx <= 1 && dy <= 1;
         }
 
         return false;
+    };
+
+    // --- Minimax AI Implementation ---
+
+    const getPieceValue = (piece) => {
+        if (!piece) return 0;
+        const code = piece.charCodeAt(0);
+        // P=10, N/B=30, R=50, Q=90, K=900 (Simplified relative codes)
+        // Auto-detect color sign
+        const val =
+            (code === 9817 || code === 9823) ? 10 : // Pawn
+                (code === 9816 || code === 9822) ? 30 : // Knight
+                    (code === 9815 || code === 9821) ? 30 : // Bishop
+                        (code === 9814 || code === 9820) ? 50 : // Rook
+                            (code === 9813 || code === 9819) ? 90 : // Queen
+                                (code === 9812 || code === 9818) ? 900 : 0; // King
+
+        return isWhite(piece) ? -val : val; // AI is Black (Positive), User is White (Negative)
+    };
+
+    const evaluateBoard = (b) => {
+        let score = 0;
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                score += getPieceValue(b[r][c]);
+            }
+        }
+        return score;
+    };
+
+    const minimax = (tempBoard, depth, isMaximizing) => {
+        if (depth === 0) return evaluateBoard(tempBoard);
+
+        const possibleMoves = getAllValidMoves(isMaximizing ? 'black' : 'white', tempBoard);
+
+        if (possibleMoves.length === 0) return isMaximizing ? -Infinity : Infinity; // Checkmate logic roughly
+
+        if (isMaximizing) {
+            let maxEval = -Infinity;
+            for (const move of possibleMoves) {
+                // Simulate Move
+                const savedTarget = tempBoard[move.to.r][move.to.c];
+                tempBoard[move.to.r][move.to.c] = move.piece;
+                tempBoard[move.from.r][move.from.c] = '';
+
+                const evalScore = minimax(tempBoard, depth - 1, false);
+
+                // Undo Move
+                tempBoard[move.from.r][move.from.c] = move.piece;
+                tempBoard[move.to.r][move.to.c] = savedTarget;
+
+                maxEval = Math.max(maxEval, evalScore);
+            }
+            return maxEval;
+        } else {
+            let minEval = Infinity;
+            for (const move of possibleMoves) {
+                // Simulate Move
+                const savedTarget = tempBoard[move.to.r][move.to.c];
+                tempBoard[move.to.r][move.to.c] = move.piece;
+                tempBoard[move.from.r][move.from.c] = '';
+
+                const evalScore = minimax(tempBoard, depth - 1, true);
+
+                // Undo Move
+                tempBoard[move.from.r][move.from.c] = move.piece;
+                tempBoard[move.to.r][move.to.c] = savedTarget;
+
+                minEval = Math.min(minEval, evalScore);
+            }
+            return minEval;
+        }
+    };
+
+    const getAllValidMoves = (color, currentBoard = board) => {
+        const moves = [];
+        const isColor = color === 'white' ? isWhite : isBlack;
+
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const piece = currentBoard[r][c];
+                if (piece && isColor(piece)) {
+                    for (let tr = 0; tr < 8; tr++) {
+                        for (let tc = 0; tc < 8; tc++) {
+                            // Basic Self-Capture Check
+                            const target = currentBoard[tr][tc];
+                            if (target && isColor(target)) continue;
+
+                            if (isValidMove(r, c, tr, tc, piece, currentBoard)) {
+                                moves.push({ from: { r, c }, to: { r: tr, c: tc }, piece, target });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return moves;
     };
 
     // AI Logic
@@ -102,57 +221,29 @@ const ChessGame = () => {
         }
     }, [turn, winner, board]);
 
-    const getAllValidMoves = (color) => {
-        const moves = [];
-        const isColor = color === 'white' ? isWhite : isBlack;
-
-        for (let r = 0; r < 8; r++) {
-            for (let c = 0; c < 8; c++) {
-                const piece = board[r][c];
-                if (piece && isColor(piece)) {
-                    for (let tr = 0; tr < 8; tr++) {
-                        for (let tc = 0; tc < 8; tc++) {
-                            if (isValidMove(r, c, tr, tc, piece)) {
-                                moves.push({
-                                    from: { r, c },
-                                    to: { r: tr, c: tc },
-                                    piece: piece,
-                                    target: board[tr][tc]
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return moves;
-    };
-
     const makeAIMove = async () => {
-        const possibleMoves = getAllValidMoves('black');
+        // Use depth 2 for decent performance without lagging
+        const possibleMoves = getAllValidMoves('black', board);
+        if (possibleMoves.length === 0) { setTurn('white'); return; }
 
-        if (possibleMoves.length === 0) {
-            setTurn('white');
-            return;
-        }
-
-        // Simple Greedy Strategy
         let bestMove = null;
-        let bestScore = -1;
+        let bestValue = -Infinity;
 
-        const shuffledMoves = possibleMoves.sort(() => Math.random() - 0.5);
+        // Shuffle to add variety if scores are equal
+        possibleMoves.sort(() => Math.random() - 0.5);
 
-        for (const move of shuffledMoves) {
-            let score = 0;
-            if (move.target) {
-                if (move.target === '♔') score = 1000; // Capture King
-                else score = 10;
-            } else {
-                score = 1;
-            }
+        // Root Maximizer
+        for (const move of possibleMoves) {
+            // Simulate
+            const newBoard = board.map(r => [...r]);
+            newBoard[move.to.r][move.to.c] = move.piece;
+            newBoard[move.from.r][move.from.c] = '';
 
-            if (score > bestScore) {
-                bestScore = score;
+            // Call Minimax (Depth 2, minimizing for White next)
+            const boardValue = minimax(newBoard, 2, false);
+
+            if (boardValue > bestValue) {
+                bestValue = boardValue;
                 bestMove = move;
             }
         }
@@ -161,13 +252,9 @@ const ChessGame = () => {
             const newBoard = board.map(r => [...r]);
             newBoard[bestMove.to.r][bestMove.to.c] = bestMove.piece;
             newBoard[bestMove.from.r][bestMove.from.c] = '';
-
             setBoard(newBoard);
             setTurn('white');
-
-            if (bestMove.target === '♔') {
-                setWinner('Black');
-            }
+            if (bestMove.target === '♔') setWinner('Black');
         }
     };
 

@@ -2,36 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
-
-/* PROFESSIONAL EMAIL TEMPLATE */
-const getEmailTemplate = (title, bodyContent) => {
-    return `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px;">
-        <div style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-            <!-- Header -->
-            <div style="background-color: #1a1a1a; padding: 25px; text-align: center; border-bottom: 4px solid #ff9933;">
-                <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 1px;">EktaSahyog</h1>
-                <p style="color: #aaaaaa; margin: 5px 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">United for Change</p>
-            </div>
-            
-            <!-- Body -->
-            <div style="padding: 40px 30px; color: #333333; line-height: 1.6;">
-                <h2 style="color: #2c3e50; margin-top: 0; font-size: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">${title}</h2>
-                <div style="margin-top: 20px;">
-                    ${bodyContent}
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div style="background-color: #f4f4f4; padding: 20px; text-align: center; color: #888888; font-size: 12px;">
-                <p style="margin: 0;">&copy; ${new Date().getFullYear()} EktaSahyog. All rights reserved.</p>
-                <p style="margin: 5px 0 0;">This brings us together.</p>
-            </div>
-        </div>
-    </div>
-    `;
-};
+import { sendEmail, getEmailTemplate } from '../services/email.js';
 
 
 /* REGISTER USER */
@@ -64,15 +35,7 @@ export const register = async (req, res) => {
         const savedUser = await newUser.save();
 
         // Send Email with OTP
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-
-        await transporter.sendMail({
+        await sendEmail({
             from: `"EktaSahyog Verification" <${process.env.EMAIL_USER}>`,
             to: savedUser.email,
             subject: "Verify Your Email - EktaSahyog",
@@ -127,16 +90,8 @@ export const login = async (req, res) => {
 
         // Send Login Success Email
         try {
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS
-                }
-            });
-
-            // Don't await this to avoid slowing down login
-            transporter.sendMail({
+            // Don't await this to avoid slowing down login significantly, but catch errors
+            sendEmail({
                 from: `"EktaSahyog Security" <${process.env.EMAIL_USER}>`,
                 to: user.email,
                 subject: "Login Alert - EktaSahyog",
@@ -156,7 +111,7 @@ export const login = async (req, res) => {
                     <p>If this was you, you can safely ignore this email.</p>
                     <p style="color: #999; font-size: 12px; margin-top: 20px;">If you did not sign in, please reset your password immediately.</p>
                 `)
-            });
+            }).catch(e => console.error("Background login email failed:", e));
         } catch (emailErr) {
             console.error("Login email failed:", emailErr);
         }
@@ -243,19 +198,10 @@ export const forgotPassword = async (req, res) => {
         user.resetPasswordExpires = Date.now() + 3600000; // 1 Hour
         await user.save();
 
-        // Send Email
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-
         // Use Client URL for link
         const resetUrl = `${process.env.CLIENT_URL || "http://localhost:5173"}/reset-password/${resetToken}`;
 
-        const mailOptions = {
+        await sendEmail({
             from: `"EktaSahyog Security" <${process.env.EMAIL_USER}>`,
             to: user.email,
             subject: "Reset Your Password - EktaSahyog",
@@ -268,9 +214,8 @@ export const forgotPassword = async (req, res) => {
                 <p style="text-align: center; color: #666; font-size: 13px;">This link expires in 1 hour.</p>
                 <p style="margin-top: 30px; font-size: 13px; color: #999;">If you didn't request a password reset, you can safely ignore this message.</p>
             `)
-        };
+        });
 
-        await transporter.sendMail(mailOptions);
         res.status(200).json({ message: "Password reset link sent to your email." });
 
     } catch (err) {
@@ -362,15 +307,7 @@ export const resendOTP = async (req, res) => {
         await user.save();
 
         // Send Email
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-
-        await transporter.sendMail({
+        await sendEmail({
             from: `"EktaSahyog Verification" <${process.env.EMAIL_USER}>`,
             to: user.email,
             subject: "New Verification Code - EktaSahyog",
