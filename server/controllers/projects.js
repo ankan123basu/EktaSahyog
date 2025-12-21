@@ -58,11 +58,12 @@ export const joinProject = async (req, res) => {
             await project.save();
 
             // Send Confirmation Email using centralized service
-            await sendEmail({
-                from: process.env.EMAIL_USER,
-                to: user.email,
-                subject: `Welcome to the Team! - ${project.title}`,
-                html: `
+            try {
+                await sendEmail({
+                    from: process.env.EMAIL_USER,
+                    to: user.email,
+                    subject: `Welcome to the Team! - ${project.title}`,
+                    html: `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,7 +158,10 @@ export const joinProject = async (req, res) => {
 </body>
 </html>
 `
-            });
+                });
+            } catch (emailErr) {
+                console.error("⚠️ Email service failed (Join Project), but DB updated successfully:", emailErr.message);
+            }
         }
 
         res.status(200).json(project);
@@ -182,12 +186,13 @@ export const leaveProject = async (req, res) => {
         project.members = project.members.filter(memberId => memberId.toString() !== userId);
         await project.save();
 
-        // Send Cancellation Email using centralized service
-        await sendEmail({
-            from: `"EktaSahyog - Unity Projects" <${process.env.EMAIL_USER}>`,
-            to: user.email,
-            subject: `📋 Participation Cancelled - "${project.title}"`,
-            html: `
+        // Send Cancellation Email using centralized service (Non-blocking fail)
+        try {
+            await sendEmail({
+                from: `"EktaSahyog - Unity Projects" <${process.env.EMAIL_USER}>`,
+                to: user.email,
+                subject: `📋 Participation Cancelled - "${project.title}"`,
+                html: `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -257,9 +262,10 @@ export const leaveProject = async (req, res) => {
 </body>
 </html>
 `
-        });
-
-        res.status(200).json(project);
+            });
+        } catch (emailErr) {
+            console.error("⚠️ Email service failed (Leave Project), but DB updated successfully:", emailErr.message);
+        } res.status(200).json(project);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
