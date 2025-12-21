@@ -5,7 +5,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Status](https://img.shields.io/badge/Status-Active_Development-brightgreen)
 ![Stack](https://img.shields.io/badge/Stack-MERN-blue)
-![AI](https://img.shields.io/badge/AI-Groq_LPU-orange)
+![AI](https://img.shields.io/badge/AI-Groq-orange)
 
 ---
 
