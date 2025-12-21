@@ -10,8 +10,11 @@
 ---
 
 ## 📖 Introduction
-**EktaSahyog** (Unity & Collaboration) is a digital ecosystem built for one singular purpose: **To Unite India.**
-In a nation of 28 states, 8 union territories, and 121 languages, we use technology to dissolve the invisible borders that divide us. It is not just a marketplace or a learning hub; it is a **National Integration Platform** where every feature serves to connect a citizen from one corner of India to another.
+**EktaSahyog** is a next-generation Unity & Collaboration platform engineered at the intersection of the **MERN stack**, **WebGL-powered browser-native Web3D**, **AI-driven systems**, **OCR**, and **real-time infrastructure**.
+
+We moved far beyond static MERN applications to architect a cultural-scale digital ecosystem — fusing multilingual AI communication, low-latency real-time collaboration, interactive cultural experiences, and WebGL-powered 3D environments to digitally represent India’s unity in motion.
+
+In a nation of 28 states, 8 union territories, and 121 languages, EktaSahyog serves one singular purpose: **To Unite India.** It is not just a marketplace or a learning hub; it is a **National Integration Platform** that uses this advanced technology to dissolve the invisible borders that divide us.
 
 ## The Mission: Unity through Diversity
 While others build walls, EktaSahyog builds bridges:
