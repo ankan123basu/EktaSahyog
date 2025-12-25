@@ -99,7 +99,12 @@ const VariableProximity = forwardRef((props, ref) => {
         }
     };
 
+    const frameCounterRef = useRef(0);
+
     useAnimationFrame(() => {
+        // Skip every other frame for 30fps instead of 60fps
+        if (frameCounterRef.current++ % 2 !== 0) return;
+
         if (!containerRef?.current) return;
         const { x, y } = mousePositionRef.current;
         if (lastPositionRef.current.x === x && lastPositionRef.current.y === y) {

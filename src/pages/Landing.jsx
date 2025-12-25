@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Globe, Users, MessageSquare, ShoppingBag, Map as MapIcon, BookOpen, Heart, Sparkles, Gamepad2 } from 'lucide-react';
 import { Button } from '../Components/ui/Button';
@@ -60,20 +60,15 @@ const Landing = () => {
         }
     ];
 
-    const floatingTerms = [
+    // Reduced from 12 to 6 for better performance
+    const floatingTerms = useMemo(() => [
         { text: "Punjab", x: "10%", delay: 0, color: "text-orange-400" },
         { text: "Kathakali", x: "85%", delay: 2, color: "text-green-400" },
         { text: "Assam Tea", x: "75%", delay: 4, color: "text-emerald-400" },
-        { text: "Pashmina", x: "20%", delay: 1, color: "text-purple-400" },
         { text: "Madhubani", x: "60%", delay: 3, color: "text-red-400" },
-        { text: "Rajasthan", x: "5%", delay: 5, color: "text-yellow-500" },
-        { text: "Bharatanatyam", x: "90%", delay: 6, color: "text-pink-400" },
-        { text: "Warli Art", x: "30%", delay: 7, color: "text-white" },
+        { text: "Rajasthan", x: "20%", delay: 5, color: "text-yellow-500" },
         { text: "Bengal", x: "50%", delay: 2.5, color: "text-red-500" },
-        { text: "Goa", x: "15%", delay: 8, color: "text-cyan-400" },
-        { text: "Bandhani", x: "40%", delay: 4.5, color: "text-orange-300" },
-        { text: "Tamil Nadu", x: "80%", delay: 9, color: "text-yellow-300" },
-    ];
+    ], []);
 
     const containerRef = React.useRef(null);
     const featuresRef = React.useRef(null);
@@ -101,17 +96,18 @@ const Landing = () => {
                             <motion.div
                                 key={i}
                                 className={`absolute font-display text-2xl md:text-4xl opacity-30 font-bold ${item.color} select-none`}
-                                style={{ left: item.x, top: -100 }}
+                                style={{ left: item.x, top: -100, willChange: 'transform, opacity' }}
                                 animate={{
                                     y: ['0vh', '120vh'],
                                     opacity: [0, 0.5, 0],
                                     rotate: [0, 10, -10, 0]
                                 }}
                                 transition={{
-                                    duration: 15 + (i % 5) * 2,
+                                    duration: 15 + (i % 3) * 2,
                                     repeat: Infinity,
                                     delay: item.delay,
-                                    ease: "linear"
+                                    ease: "linear",
+                                    type: "tween"
                                 }}
                             >
                                 {item.text}
@@ -155,15 +151,9 @@ const Landing = () => {
                         </div>
 
                         <div className="cursor-default max-w-4xl mx-auto">
-                            <VariableProximity
-                                label="One platform where many communities connect, collaborate, and create impact, fostering a vibrant ecosystem of shared culture and heritage. Together, we bridge gaps, empower local artisans, and celebrate the rich tapestry of traditions that make India truly unique."
-                                className="text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] font-medium leading-relaxed"
-                                fromFontVariationSettings="'wght' 300, 'opsz' 9"
-                                toFontVariationSettings="'wght' 700, 'opsz' 40"
-                                containerRef={containerRef}
-                                radius={100}
-                                falloff="linear"
-                            />
+                            <p className="text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] font-medium leading-relaxed text-center">
+                                One platform where many communities connect, collaborate, and create impact, fostering a vibrant ecosystem of shared culture and heritage. Together, we bridge gaps, empower local artisans, and celebrate the rich tapestry of traditions that make India truly unique.
+                            </p>
                         </div>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8">
@@ -232,7 +222,7 @@ const Landing = () => {
             {/* Features Grid: 6 KADAM */}
             <section ref={featuresRef} className="relative px-4 sm:px-6 lg:px-8 py-24 bg-black/10 backdrop-blur-sm z-10 overflow-hidden">
                 <div className="absolute inset-0 z-0 opacity-30">
-                    <Ballpit count={30} gravity={0.5} friction={0.9} wallBounce={0.9} followCursor={true} colors={[0xff9933, 0xffffff, 0x138808]} />
+                    <Ballpit count={15} gravity={0.5} friction={0.9} wallBounce={0.9} followCursor={true} colors={[0xff9933, 0xffffff, 0x138808]} />
                 </div>
                 <div className="max-w-7xl mx-auto relative z-10">
                     <div className="text-center mb-20">
@@ -241,15 +231,9 @@ const Landing = () => {
                             whileInView={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.8, ease: "backOut" }}
                         >
-                            <VariableProximity
-                                label="6 KADAM, EKTA KI AUR"
-                                className="text-4xl md:text-6xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] drop-shadow-lg cursor-default h-20"
-                                fromFontVariationSettings="'wght' 400, 'opsz' 9"
-                                toFontVariationSettings="'wght' 900, 'opsz' 40"
-                                containerRef={featuresRef}
-                                radius={100}
-                                falloff="linear"
-                            />
+                            <h2 className="text-4xl md:text-6xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] drop-shadow-lg cursor-default h-auto">
+                                6 KADAM, EKTA KI AUR
+                            </h2>
                             <div className="h-1.5 w-32 bg-gradient-to-r from-unity-saffron to-unity-emerald mx-auto rounded-full shadow-[0_0_15px_rgba(255,153,51,0.5)]" />
                         </motion.div>
                     </div>
@@ -296,7 +280,7 @@ const Landing = () => {
 
                 {/* Floating Particles Background */}
                 <div className="absolute inset-0 z-0 opacity-40">
-                    <Ballpit count={40} gravity={0.1} friction={0.99} wallBounce={0.99} followCursor={false} colors={[0xff9933, 0xffffff, 0x138808]} />
+                    <Ballpit count={20} gravity={0.1} friction={0.99} wallBounce={0.99} followCursor={false} colors={[0xff9933, 0xffffff, 0x138808]} />
                 </div>
 
                 <div className="relative z-10 w-full">
@@ -306,15 +290,9 @@ const Landing = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}
                         >
-                            <VariableProximity
-                                label="DIL KI BAAT, DESH KE SAATH"
-                                className="text-4xl md:text-6xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] drop-shadow-2xl cursor-default h-20"
-                                fromFontVariationSettings="'wght' 400, 'opsz' 9"
-                                toFontVariationSettings="'wght' 900, 'opsz' 40"
-                                containerRef={testimonialsRef}
-                                radius={100}
-                                falloff="linear"
-                            />
+                            <h2 className="text-4xl md:text-6xl mb-6 font-display font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-white to-[#138808] drop-shadow-2xl cursor-default h-auto">
+                                DIL KI BAAT, DESH KE SAATH
+                            </h2>
                             <p className="text-gray-300 text-xl max-w-2xl mx-auto font-light tracking-wide">
                                 Real stories. Real connections. <span className="text-unity-saffron font-medium">One India.</span>
                             </p>
@@ -325,6 +303,7 @@ const Landing = () => {
                     <div className="flex overflow-hidden relative w-full mask-gradient-x py-10">
                         <motion.div
                             className="flex gap-10 px-10 w-max"
+                            style={{ willChange: 'transform' }}
                             animate={{ x: ["0%", "-50%"] }}
                             transition={{
                                 duration: 50,

@@ -1,14 +1,15 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
-import { ScanLine, Mail, Lock, User, MapPin, Globe, Loader2, Sparkles, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, MapPin, Globe, Loader2, Sparkles, ArrowRight, ScanLine } from 'lucide-react';
 import { Button } from '../Components/ui/Button';
 import OCRModal from '../Components/features/OCRModal';
 import BackgroundBeams from '../Components/ui/BackgroundBeams';
-import ElectricBorder from '../Components/ui/ElectricBorder';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import bg1 from '../Images/wmremove-transformed.png';
+import unityImage from '../Images/unity-in-diversity-stockcake.webp';
 
+// --- VISUAL COMPONENTS RESTORED ---
 const TiltCard = ({ children }) => {
     const x = useMotionValue(0);
     const y = useMotionValue(0);
@@ -16,8 +17,8 @@ const TiltCard = ({ children }) => {
     const mouseX = useSpring(x, { stiffness: 150, damping: 15 });
     const mouseY = useSpring(y, { stiffness: 150, damping: 15 });
 
-    const rotateX = useTransform(mouseY, [-0.5, 0.5], ["15deg", "-15deg"]);
-    const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-15deg", "15deg"]);
+    const rotateX = useTransform(mouseY, [-0.5, 0.5], ["5deg", "-5deg"]);
+    const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-5deg", "5deg"]);
 
     const handleMouseMove = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -80,33 +81,46 @@ const FloatingParticles = () => {
     );
 };
 
+// --- FIX: InputField Moved OUTSIDE Component to prevent focus loss ---
+const InputField = ({ type, placeholder, value, onChange, icon: Icon }) => (
+    <div className="relative group">
+        <div className="absolute left-3 top-3.5 text-gray-400 group-focus-within:text-unity-saffron transition-colors">
+            <Icon className="w-5 h-5" />
+        </div>
+        <input
+            type={type}
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-unity-saffron/50 focus:border-unity-saffron block p-3 pl-10 transition-all placeholder-gray-400"
+            required
+        />
+    </div>
+);
+
 const Auth = () => {
+    // --- AUTH LOGIC (PRESERVED) ---
     const [isLogin, setIsLogin] = useState(true);
     const [showOCR, setShowOCR] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState(""); // Added Success State
+    const [success, setSuccess] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Handle Google Login Callback & Redirect Messages
-    React.useEffect(() => {
+    useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const token = params.get('token');
         const userStr = params.get('user');
         const errorMsg = params.get('error');
 
-        // Check for state message from VerifyEmail
         if (location.state?.successMessage) {
             setSuccess(location.state.successMessage);
-            // Clear state so refresh doesn't show it again
             window.history.replaceState({}, document.title);
         }
-        // Also check if passed via email logic redirect
         if (location.state?.email) {
             setFormData(prev => ({ ...prev, email: location.state.email }));
         }
-
 
         if (token && userStr) {
             try {
@@ -114,313 +128,180 @@ const Auth = () => {
                 localStorage.setItem('token', token);
                 localStorage.setItem('user', JSON.stringify(user));
                 window.dispatchEvent(new Event('user-login'));
-
-                // Clear URL
                 window.history.replaceState({}, document.title, window.location.pathname);
-
-                // Redirect
-                if (user.role === 'admin') navigate('/dashboard');
-                else navigate('/projects');
+                navigate(user.role === 'admin' ? '/dashboard' : '/projects');
             } catch (e) {
-                console.error("Failed to parse user data", e);
-                setError("Login failed. Please try again.");
+                console.error("Failed to parse", e);
+                setError("Login failed.");
             }
         } else if (errorMsg) {
-            setError("Google Login failed. Please try again.");
+            setError("Google Login failed.");
         }
     }, [navigate, location]);
 
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        region: '',
-        language: ''
-    });
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', region: '', language: '' });
 
-    const handleOCRComplete = (data) => {
-        setFormData(prev => ({
-            ...prev,
-            name: data.name,
-            region: data.region,
-            language: data.language
-        }));
-    };
+    const handleOCRComplete = (data) => setFormData(prev => ({ ...prev, ...data }));
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         setError("");
-        setSuccess("");
 
         try {
             const endpoint = isLogin ? '/auth/login' : '/auth/register';
             const url = `http://localhost:5001${endpoint}`;
-
             const payload = isLogin
                 ? { email: formData.email, password: formData.password }
-                : {
-                    ...formData,
-                    location: formData.region, // Send the string region as 'location'
-                    region: { type: "Point", coordinates: [0, 0] } // Mock coordinates for now
-                };
+                : { ...formData, location: formData.region, region: { type: "Point", coordinates: [0, 0] } };
 
             const { data } = await axios.post(url, payload);
 
             if (!isLogin) {
-                // Registration Logic: Redirect to Verify
                 navigate('/verify-email', { state: { email: formData.email } });
                 return;
             }
 
-            // Login Logic
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            window.dispatchEvent(new Event('user-login')); // Trigger Navbar update
-
-            if (data.user.email === 'admin@ektasahyog.com') {
-                navigate('/dashboard');
-            } else {
-                navigate('/projects');
-            }
+            window.dispatchEvent(new Event('user-login'));
+            navigate(data.user.email === 'admin@ektasahyog.com' ? '/dashboard' : '/projects');
 
         } catch (err) {
-            setError(err.response?.data?.msg || err.response?.data?.error || "An error occurred");
+            // Displays backend error message (e.g., "User already exists")
+            let msg = err.response?.data?.msg || err.response?.data?.error || "An error occurred";
+            if (msg.includes("E11000") || msg.includes("duplicate key")) {
+                msg = "This email is already registered. Please login.";
+            }
+            setError(msg);
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen relative bg-unity-dark overflow-x-hidden">
-            {/* Fixed Background Elements */}
+        <div className="min-h-screen relative bg-unity-dark overflow-x-hidden pt-28 pb-12 flex items-center justify-center px-4">
+
+            {/* --- RICH BACKGROUND (RESTORED) --- */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-                <div className="absolute inset-0 opacity-60">
-                    <img src={bg1} alt="Background" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-unity-dark/70 via-unity-dark/40 to-unity-dark" />
+                <div className="absolute inset-0 opacity-[0.70]">
+                    <img src={bg1} alt="Rich Background" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-unity-dark/90 via-unity-dark/50 to-unity-dark" />
                 </div>
                 <BackgroundBeams />
                 <FloatingParticles />
-                {/* Animated Orbs */}
-                <div className="absolute top-20 left-20 w-72 h-72 bg-unity-indigo/30 rounded-full blur-[100px] animate-pulse-slow" />
-                <div className="absolute bottom-20 right-20 w-96 h-96 bg-unity-emerald/20 rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
             </div>
 
-            {/* Scrollable Content Container */}
-            <div className="min-h-screen flex items-center justify-center px-4 pt-32 pb-20 relative z-10">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="w-full max-w-md perspective-1000 my-auto"
-                >
-                    <TiltCard>
-                        <ElectricBorder color={isLogin ? "#4338ca" : "#f59e0b"}>
-                            <div className="bg-black/40 backdrop-blur-xl p-6 rounded-xl border border-white/10 shadow-2xl">
-                                <div className="text-center mb-6">
-                                    <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/5 mb-3 border border-white/10">
-                                        <Sparkles className={`w-5 h-5 ${isLogin ? 'text-unity-indigo' : 'text-unity-saffron'}`} />
-                                    </div>
-                                    <h2 className="text-2xl font-display text-white mb-1 tracking-wide">
-                                        {isLogin ? 'WELCOME BACK' : 'JOIN THE MOVEMENT'}
-                                    </h2>
-                                    <p className="text-gray-400 text-xs">
-                                        {isLogin ? 'Continue your journey of unity' : 'Start connecting with communities'}
-                                    </p>
-                                </div>
+            {/* --- MAIN CONTENT (COMPACT CARD, Z-INDEX 10) --- */}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="relative z-10 w-full max-w-4xl perspective-1000"
+            >
+                {/* TILT EFFECT Wrapper */}
+                <TiltCard>
+                    <div className="w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row ring-1 ring-white/10 opacity-95 hover:opacity-100 transition-opacity">
 
-                                {/* Toggle Switch */}
-                                <div className="relative flex p-1 bg-black/40 rounded-lg mb-6 border border-white/5">
-                                    <motion.div
-                                        className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-md ${isLogin ? 'bg-unity-indigo' : 'bg-unity-saffron'}`}
-                                        animate={{ x: isLogin ? 0 : '100%' }}
-                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                    />
-                                    <button
-                                        onClick={() => setIsLogin(true)}
-                                        className={`flex-1 py-1.5 text-xs font-medium relative z-10 transition-colors ${isLogin ? 'text-white' : 'text-gray-400 hover:text-white'}`}
-                                    >
-                                        LOGIN
-                                    </button>
-                                    <button
-                                        onClick={() => setIsLogin(false)}
-                                        className={`flex-1 py-1.5 text-xs font-medium relative z-10 transition-colors ${!isLogin ? 'text-black' : 'text-gray-400 hover:text-white'}`}
-                                    >
-                                        SIGN UP
-                                    </button>
-                                </div>
+                        {/* LEFT: User's Requested Image */}
+                        <div className="w-full md:w-5/12 relative bg-gray-900 overflow-hidden hidden md:block">
+                            <img
+                                src={unityImage}
+                                alt="Unity in Diversity"
+                                className="absolute inset-0 w-full h-full object-cover opacity-90 transition-transform duration-[10s] hover:scale-110"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                            <div className="absolute bottom-8 left-8 right-8 text-white z-10">
+                                <h2 className="text-2xl font-display font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-unity-saffron via-white to-unity-emerald">
+                                    Unity in Diversity
+                                </h2>
+                                <p className="text-sm text-gray-300 leading-relaxed font-light">
+                                    Join the movement connecting a billion hearts.
+                                </p>
+                            </div>
+                        </div>
 
-                                {/* Messages */}
-                                <AnimatePresence>
-                                    {error && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -10 }}
-                                            className="mb-4 p-2 bg-red-500/10 border border-red-500/20 rounded-lg text-red-200 text-xs text-center flex items-center justify-center gap-2"
-                                        >
-                                            <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                                            {error}
-                                        </motion.div>
-                                    )}
-                                    {success && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -10 }}
-                                            className="mb-4 p-2 bg-green-500/10 border border-green-500/20 rounded-lg text-green-200 text-xs text-center flex items-center justify-center gap-2"
-                                        >
-                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                                            {success}
+                        {/* RIGHT: Compact Form */}
+                        <div className="w-full md:w-7/12 p-8 md:p-12 bg-white relative">
+                            <div className="text-center mb-8">
+                                <div className="inline-block p-3 rounded-full bg-gray-50 mb-4 shadow-sm">
+                                    <Sparkles className={`w-6 h-6 ${isLogin ? 'text-unity-indigo' : 'text-unity-saffron'}`} />
+                                </div>
+                                <h1 className="text-2xl font-bold text-gray-900 mb-1 font-display tracking-tight">
+                                    {isLogin ? 'Welcome Back' : 'Create Account'}
+                                </h1>
+                                <p className="text-sm text-gray-500">
+                                    {isLogin ? 'Enter your credentials to continue' : 'Start your journey with us today'}
+                                </p>
+                            </div>
+
+                            <AnimatePresence>
+                                {(error || success) && (
+                                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className={`mb-4 p-3 rounded-lg text-sm border-l-4 ${error ? 'bg-red-50 text-red-700 border-red-500' : 'bg-green-50 text-green-700 border-green-500'}`}>
+                                        {error || success}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <AnimatePresence mode="wait">
+                                    {!isLogin && (
+                                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-4 overflow-hidden">
+                                            <Button type="button" variant="outline" className="w-full h-9 text-xs border-dashed border-unity-saffron text-unity-saffron hover:bg-orange-50" onClick={() => setShowOCR(true)}>
+                                                <ScanLine className="mr-2 w-3 h-3" /> Auto-fill with ID
+                                            </Button>
+                                            <InputField type="text" placeholder="Full Name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} icon={User} />
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
 
-                                {/* Form */}
-                                <form onSubmit={handleSubmit} className="space-y-4">
-                                    <AnimatePresence mode="wait">
-                                        {!isLogin && (
-                                            <motion.div
-                                                initial={{ opacity: 0, height: 0 }}
-                                                animate={{ opacity: 1, height: 'auto' }}
-                                                exit={{ opacity: 0, height: 0 }}
-                                                className="space-y-3 overflow-hidden"
-                                            >
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    className="w-full py-2 text-xs border-dashed border-unity-saffron/30 text-unity-saffron hover:bg-unity-saffron/10 hover:border-unity-saffron"
-                                                    onClick={() => setShowOCR(true)}
-                                                >
-                                                    <ScanLine className="mr-2 w-3 h-3" /> Auto-fill with ID Card
-                                                </Button>
+                                <InputField type="email" placeholder="example@email.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} icon={Mail} />
+                                <InputField type="password" placeholder="••••••••" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} icon={Lock} />
 
-                                                <div className="relative group">
-                                                    <User className="absolute left-3 top-3 text-gray-500 w-4 h-4 group-focus-within:text-unity-saffron transition-colors" />
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Full Name"
-                                                        value={formData.name}
-                                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                        className="w-full bg-black/20 border border-white/10 rounded-lg p-2.5 pl-9 text-sm text-white placeholder-gray-500 focus:border-unity-saffron focus:ring-1 focus:ring-unity-saffron focus:outline-none transition-all"
-                                                        required
-                                                    />
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-
-                                    <div className="relative group">
-                                        <Mail className={`absolute left-3 top-3 text-gray-500 w-4 h-4 transition-colors ${isLogin ? 'group-focus-within:text-unity-indigo' : 'group-focus-within:text-unity-saffron'}`} />
-                                        <input
-                                            type="email"
-                                            placeholder="Email Address"
-                                            value={formData.email}
-                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            className={`w-full bg-black/20 border border-white/10 rounded-lg p-2.5 pl-9 text-sm text-white placeholder-gray-500 focus:outline-none transition-all ${isLogin ? 'focus:border-unity-indigo focus:ring-1 focus:ring-unity-indigo' : 'focus:border-unity-saffron focus:ring-1 focus:ring-unity-saffron'}`}
-                                            required
-                                        />
+                                {isLogin && (
+                                    <div className="flex justify-end">
+                                        <a href="/forgot-password" className="text-xs font-semibold text-unity-saffron hover:underline">Forgot password?</a>
                                     </div>
+                                )}
 
-                                    <div className="relative group">
-                                        <Lock className={`absolute left-3 top-3 text-gray-500 w-4 h-4 transition-colors ${isLogin ? 'group-focus-within:text-unity-indigo' : 'group-focus-within:text-unity-saffron'}`} />
-                                        <input
-                                            type="password"
-                                            placeholder="Password"
-                                            value={formData.password}
-                                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                            className={`w-full bg-black/20 border border-white/10 rounded-lg p-2.5 pl-9 text-sm text-white placeholder-gray-500 focus:outline-none transition-all ${isLogin ? 'focus:border-unity-indigo focus:ring-1 focus:ring-unity-indigo' : 'focus:border-unity-saffron focus:ring-1 focus:ring-unity-saffron'}`}
-                                            required
-                                        />
-                                        {isLogin && (
-                                            <div className="text-right mt-1.5">
-                                                <a href="/forgot-password" className="text-[10px] text-unity-saffron hover:text-white transition-colors">
-                                                    Forgot Password?
-                                                </a>
-                                            </div>
-                                        )}
-                                    </div>
+                                <AnimatePresence mode="wait">
+                                    {!isLogin && (
+                                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="grid grid-cols-2 gap-3 overflow-hidden">
+                                            <InputField type="text" placeholder="Region" value={formData.region} onChange={e => setFormData({ ...formData, region: e.target.value })} icon={MapPin} />
+                                            <InputField type="text" placeholder="Language" value={formData.language} onChange={e => setFormData({ ...formData, language: e.target.value })} icon={Globe} />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
 
-                                    <AnimatePresence mode="wait">
-                                        {!isLogin && (
-                                            <motion.div
-                                                initial={{ opacity: 0, height: 0 }}
-                                                animate={{ opacity: 1, height: 'auto' }}
-                                                exit={{ opacity: 0, height: 0 }}
-                                                className="grid grid-cols-2 gap-3 overflow-hidden"
-                                            >
-                                                <div className="relative group">
-                                                    <MapPin className="absolute left-3 top-3 text-gray-500 w-4 h-4 group-focus-within:text-unity-saffron transition-colors" />
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Region"
-                                                        value={formData.region}
-                                                        onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                                                        className="w-full bg-black/20 border border-white/10 rounded-lg p-2.5 pl-9 text-sm text-white placeholder-gray-500 focus:border-unity-saffron focus:ring-1 focus:ring-unity-saffron focus:outline-none transition-all"
-                                                        required
-                                                    />
-                                                </div>
-                                                <div className="relative group">
-                                                    <Globe className="absolute left-3 top-3 text-gray-500 w-4 h-4 group-focus-within:text-unity-saffron transition-colors" />
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Language"
-                                                        value={formData.language}
-                                                        onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-                                                        className="w-full bg-black/20 border border-white/10 rounded-lg p-2.5 pl-9 text-sm text-white placeholder-gray-500 focus:border-unity-saffron focus:ring-1 focus:ring-unity-saffron focus:outline-none transition-all"
-                                                        required
-                                                    />
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
+                                <Button className="w-full h-11 bg-gray-900 hover:bg-black text-white rounded-lg shadow-lg text-sm font-semibold tracking-wide transition-all active:scale-[0.98]" disabled={isLoading}>
+                                    {isLoading ? <Loader2 className="animate-spin w-5 h-5 mx-auto" /> : (isLogin ? 'Sign In' : 'Sign Up')}
+                                </Button>
+                            </form>
 
-                                    <Button
-                                        variant={isLogin ? "primary" : "accent"}
-                                        className="w-full mt-4 py-3 text-sm shadow-lg hover:shadow-xl transition-all relative overflow-hidden group"
-                                        disabled={isLoading}
-                                    >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                                        {isLoading ? <Loader2 className="animate-spin mr-2 w-4 h-4" /> : null}
-                                        {isLogin ? 'Login' : 'Create Account'} <ArrowRight className="ml-2 w-4 h-4" />
-                                    </Button>
-
-                                    {/* Google Login Button */}
-                                    <div className="relative my-4">
-                                        <div className="absolute inset-0 flex items-center">
-                                            <div className="w-full border-t border-white/10"></div>
-                                        </div>
-                                        <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-                                            <span className="px-2 bg-black/40 text-gray-500">Or continue with</span>
-                                        </div>
-                                    </div>
-
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        className="w-full bg-white text-gray-800 hover:bg-gray-100 flex items-center justify-center gap-2 py-2.5 text-sm"
-                                        onClick={() => window.location.href = "http://localhost:5001/auth/google"}
-                                    >
-                                        <svg className="w-4 h-4" viewBox="0 0 24 24">
-                                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                                        </svg>
-                                        Google
-                                    </Button>
-                                </form>
+                            <div className="my-6 flex items-center gap-3">
+                                <div className="h-px bg-gray-200 flex-1" />
+                                <span className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Or</span>
+                                <div className="h-px bg-gray-200 flex-1" />
                             </div>
-                        </ElectricBorder>
-                    </TiltCard>
-                </motion.div>
 
-                <OCRModal
-                    isOpen={showOCR}
-                    onClose={() => setShowOCR(false)}
-                    onScanComplete={handleOCRComplete}
-                />
-            </div>
+                            <div className="space-y-4 text-center">
+                                <button type="button" onClick={() => window.location.href = "http://localhost:5001/auth/google"} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
+                                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="G" />
+                                    Google Account
+                                </button>
+                                <p className="text-sm text-gray-500">
+                                    {isLogin ? "New here?" : "Joined us before?"}
+                                    <button onClick={() => setIsLogin(!isLogin)} className="ml-1.5 font-bold text-unity-saffron hover:underline">
+                                        {isLogin ? 'Create an account' : 'Log in'}
+                                    </button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </TiltCard>
+            </motion.div>
+
+            <OCRModal isOpen={showOCR} onClose={() => setShowOCR(false)} onScanComplete={handleOCRComplete} />
         </div>
     );
 };

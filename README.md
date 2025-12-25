@@ -158,6 +158,18 @@ We re-engineered standard features into tools for connection:
 *   **Computer Vision (OCR)**: `tesseract.js` (for text scanning)
 *   **Payments**: Stripe Integration (Mock/Test Mode)
 
+### 10. Client-Side OCR (Proprietary Implementation) 👁️
+*   **Concept**: Instant identity verification without server-side processing overhead.
+*   **Tech Stack**:
+    *   **Engine**: `Tesseract.js` (WASM-based pure JS OCR engine).
+    *   **Camera**: `react-webcam` for live frame capture.
+*   **Data Pipeline**:
+    *   **Preprocessing**: Custom HTML5 Canvas logic converts images to **Grayscale**, increases **Contrast** by 20%, and applies **Binarization** (Thresholding) to isolate text from background noise.
+    *   **Parsing Logic**:
+        *   **Name Extraction**: Heuristic regex algorithms scan for "Name:" keywords or capitalize word patterns above "DOB" fields.
+        *   **Region Recognition**: Fuzzy matching against a hardcoded array of 28 Indian States.
+*   **Privacy**: All processing happens locally in the user's browser (Client-Side), ensuring sensitive ID data never leaves the device during the scan phase.
+
 ### Game Engine & Algorithms
 *   **Chess Logic**: `chess.js` (Rules) & `react-chessboard` (UI)
 *   **Minimax Algorithm**: Custom Depth-2 AI for Chess with alpha-beta pruning concepts.
