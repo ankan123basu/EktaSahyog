@@ -143,9 +143,40 @@ const Navbar = () => {
                                 </div>
                             </div>
 
+                            {/* Connect Dropdown (Chat + Video) */}
+                            <div className="relative group">
+                                <button className="flex items-center space-x-1 text-sm font-medium text-gray-300 hover:text-white uppercase tracking-wide transition-colors py-2">
+                                    <span>Connect</span>
+                                    <ChevronDown size={14} className="group-hover:text-unity-saffron transition-colors" />
+                                </button>
+
+                                {/* Dropdown Menu */}
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top">
+                                    <div className="bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl p-2 flex flex-col gap-1">
+                                        {[
+                                            { name: '💬 Text Chat', path: '/chat', desc: 'Multi-language messaging' },
+                                            { name: '📹 Drishti-Milan', path: '/drishti-milan', desc: 'Cultural video calls' }
+                                        ].map((item) => (
+                                            <Link
+                                                key={item.name}
+                                                to={item.path}
+                                                className={`block px-4 py-2 rounded-lg transition-colors ${location.pathname === item.path
+                                                    ? 'bg-white/10 text-unity-saffron'
+                                                    : item.highlight
+                                                        ? 'text-unity-saffron hover:bg-unity-saffron/10'
+                                                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                                                    }`}
+                                            >
+                                                <div className="font-medium text-sm">{item.name}</div>
+                                                <div className="text-xs text-gray-400 mt-0.5">{item.desc}</div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Remaining Links */}
                             {[
-                                { name: 'Chat', path: '/chat' },
                                 { name: 'About Us', path: '/about' },
                                 ...(isAdmin ? [
                                     { name: 'Map', path: '/map' },

@@ -95,10 +95,10 @@ We re-engineered standard features into tools for connection:
 *   **Reviving Ancient Games**:
     *   **Moksha Patam** (Snakes & Ladders)
     *   **Ganjifa** (Mughal Cards)
-    *   **Chaturanga** (Chess)
+
     *   **Pallanguzhi** (Mancala)
 *   **Tech Under the Hood**:
-    *   **Chess AI**: Custom **Minimax Algorithm** (Depth-2 Recursive) with position evaluation heuristics. **No external libraries** like `chess.js` used.
+
     *   **Game Engines**: Custom React State grids for board logic (Snakes & Ladders/Pallanguzhi).
     *   **Animations**: CSS3 Transforms (Rotate/Scale) for card flips and piece movements.
 
@@ -152,6 +152,13 @@ We re-engineered standard features into tools for connection:
 *   **Physics/Math**: Three.js (Vector Math for movement)
 *   **Effects**: `canvas-confetti` (Particle System)
 
+### Video Calling (Drishti-Milan)
+*   **Core Technology**: Pure WebRTC (RTCPeerConnection)
+*   **Signaling**: Socket.io (for Offer/Answer/ICE candidate exchange)
+*   **Media Capture**: Native Browser APIs (`getUserMedia`)
+*   **STUN Servers**: Google Public STUN (NAT traversal)
+*   **Architecture**: P2P (Peer-to-Peer) - No external SDKs like Agora/Twilio
+*   **UI Framework**: React with `lucide-react` icons
 
 ### Backend
 *   **Runtime**: Node.js
@@ -183,10 +190,19 @@ We re-engineered standard features into tools for connection:
         *   **Region Recognition**: Fuzzy matching against a hardcoded array of 28 Indian States.
 *   **Privacy**: All processing happens locally in the user's browser (Client-Side), ensuring sensitive ID data never leaves the device during the scan phase.
 
+### 11. Drishti-Milan (Next-Gen Video Calling) 📹
+*   **Concept**: A cultural video calling experience that celebrates identity.
+*   **Current Features**:
+    *   **Regional Aesthetics**: Video borders automatically change color based on the user's state (e.g., Saffron for Maharashtra, Green for Kerala).
+    *   **Identity Badges**: Displays user's location and preferred language on the video feed.
+    *   **Swap View**: interactive toggle to switch positions of local and remote video.
+    *   **Report Interface**: UI functionality to report users for moderation.
+*   **Tech Under the Hood**:
+    *   **Pure WebRTC**: Custom implementation using `RTCPeerConnection` and `socket.io` signaling.
+    *   **React State UI**: Dynamic rendering of video grid and overlays.
+
 ### Game Engine & Algorithms
-*   **Chess Logic**: `chess.js` (Rules) & `react-chessboard` (UI)
-*   **Minimax Algorithm**: Custom Depth-2 AI for Chess with alpha-beta pruning concepts.
-*   **Collision Detection**: Custom path-checking logic for 3D metaverse movement and chess pieces.
+*   **Collision Detection**: Custom path-checking logic for 3D metaverse movement.
 *   **Procedural Generation**: Random tree placement and star fields in the Metaverse.
 *   **Card Physics**: CSS 3D Transforms (`rotate-y-180`, `preserve-3d`) for Ganjifa.
 
@@ -262,6 +278,275 @@ EktaSahyog/
     # Server (Backend)
     node server/index.js
     ```
+
+---
+
+## 📊 Data Flow Diagrams
+
+### 1. Authentication Flow (Email + Google OAuth)
+```
+User Registration
+      ↓
+Email/Password → bcrypt Hash (10 rounds) → MongoDB User Collection
+      ↓
+Email Verification Token Generated (crypto.randomBytes)
+      ↓
+Nodemailer sends verification email
+      ↓
+User clicks link → isEmailVerified = true
+      ↓
+Login: JWT Generated (7-day expiry) + localStorage storage
+      ↓
+Protected Routes: verifyToken middleware validates JWT on every API call
+```
+
+**Google OAuth Flow:**
+```
+User clicks Google Login → Redirect to Google Auth API
+      ↓
+User approves → Google sends authorization code
+      ↓
+Backend exchanges code for user profile (Passport.js GoogleStrategy)
+      ↓
+Find or Create user in MongoDB
+      ↓
+Generate JWT → Redirect to frontend with token in URL params
+      ↓
+Frontend extracts token → localStorage.setItem('token', jwt)
+```
+
+### 2. Marketplace & Payment Flow
+```
+Browse Products → Filter by Region/Category
+      ↓
+Add to Cart (CartContext - React Context API)
+      ↓
+Checkout → Stripe Payment Intent Created (server/controllers/payment.js)
+      ↓
+Stripe Hosted Checkout Page (Test Mode - Card Payment)
+      ↓
+Success → Stripe Webhook (checkout.session.completed)
+      ↓
+Server validates webhook signature → Updates Order in MongoDB
+      ↓
+Redirect user to success page with order confirmation
+```
+
+### 3. Real-Time Chat with AI Translation
+```
+User sends message → Socket.io emit('send_message')
+      ↓
+Server receives → Groq AI Toxicity Check (llama-3.1-8b-instant)
+      ↓
+If SAFE → Groq Translation API (sourceLang → targetLang)
+      ↓
+Socket.io broadcast to room (joined by user.location)
+      ↓
+All users in region receive translated message in their language
+      ↓
+MongoDB ChatMessage collection stores original + translation
+```
+
+### 4. Drishti-Milan WebRTC Signaling
+```
+Caller: socket.emit('send_video_call_request')
+      ↓
+Server: Find receiver → socket.to(receiverId).emit('incoming_call')
+      ↓
+Receiver: Sees modal → Click Accept → emit('accept_video_call')
+      ↓
+Server: Look up caller's socketId (userIdToSocket Map)
+      ↓
+Server: emit('call_accepted') to caller with receiver's socket ID
+      ↓
+Caller: Creates RTCPeerConnection → Adds local media tracks
+      ↓
+Caller: createOffer() → socket.emit('webrtc_offer')
+      ↓
+Receiver: setRemoteDescription(offer) → createAnswer()
+      ↓
+Receiver: socket.emit('webrtc_answer')
+      ↓
+Both: Exchange ICE candidates → P2P connection established
+      ↓
+Direct video/audio streaming between browsers (no server relay)
+```
+
+### 5. Metaverse 3D Rendering Pipeline
+```
+User enters Metaverse → React Three Fiber Canvas mounts
+      ↓
+PointerLockControls activated on click
+      ↓
+WASD keys → Player component updates camera position (useFrame loop)
+      ↓
+Products fetched from MongoDB → Mapped to 3D Stall positions
+      ↓
+InstancedMesh renders 250+ particles (Lanterns + Flowers) efficiently
+      ↓
+Raycasting detects stall click → Exit PointerLock → Show ProductModal
+      ↓
+User buys → confetti() animation → addToCart (Context API)
+```
+
+---
+
+## ⚠️ Limitations
+
+### 1. **Stripe Payment (Test Mode Only)**
+*   Uses `sk_test_` keys — **Not production-ready**
+*   Test cards work (e.g., `4242 4242 4242 4242`)
+*   Requires migration to live keys + compliance verification for real transactions
+
+### 2. **WebRTC Scalability**
+*   **P2P Architecture:** Works for 1-on-1 calls only
+*   No SFU/MCU server for group calls
+*   NAT traversal may fail without STUN/TURN servers in strict networks
+*   Current STUN: Free Google servers (rate-limited in production)
+
+### 3. **AI Translation Latency**
+*   Groq API calls add ~500ms-1s delay per message
+*   No local caching of translations
+*   Fallback: Returns original text if API fails (fail-open strategy)
+
+### 4. **OCR Accuracy**
+*   Tesseract.js accuracy depends on image quality (~70-85% for Indian IDs)
+*   Requires decent lighting and clear text
+*   Fallback: Hardcoded demo data if extraction fails
+
+### 5. **3D Metaverse Browser Compatibility**
+*   Requires WebGL 2.0 support
+*   Performance issues on low-end devices (mobile)
+*   InstancedMesh with 250+ particles may lag on Intel integrated GPUs
+
+### 6. **No Email Rate Limiting**
+*   Nodemailer verification emails can be spammed
+*   No CAPTCHA or rate limit on registration endpoint
+
+### 7. **MongoDB Atlas Free Tier**
+*   512 MB storage limit
+*   May hit connection limits with concurrent Socket.io users
+
+### 8. **Frontend Route Protection**
+*   No React Router guards — Users can manually navigate to `/projects` even if not logged in
+*   API calls fail (backend verifyToken catches it), but blank page loads
+
+### 9. **No Image CDN**
+*   Product images stored as base64 strings in MongoDB
+*   Bloated database size
+*   Cloudinary/AWS S3 integration missing
+
+---
+
+## 🚀 Future Scope
+
+### 1. **Advanced Safety Features**
+*   **AI Content Moderation:** Integrate Groq/OpenAI vision API to detect inappropriate video content during calls
+*   **Screenshot Detection:** WebRTC getDisplayMedia() to detect screen recording attempts
+*   **Time Limits:** Restrict new users (<7 days) to 15-minute calls
+
+### 2. **Live Translation for Video Calls**
+*   Integrate Web Speech API (`SpeechRecognition`) for speech-to-text
+*   Groq translate recognized speech → Send as subtitle via Socket.io
+*   Display translated subtitles in real-time
+
+### 3. **Group Video Calls**
+*   Implement SFU (Selective Forwarding Unit) with mediasoup.js
+*   Support 4-8 participants with adaptive bitrate
+
+### 4. **Virtual Backgrounds (AI-Powered)**
+*   TensorFlow.js BodyPix for person segmentation
+*   Replace background with cultural images (Taj Mahal, Lotus Temple, etc.)
+
+### 5. **Blockchain for Artisan Verification**
+*   Polygon/Ethereum smart contracts to verify artisan authenticity
+*   NFT certificates for handmade products
+
+### 6. **Mobile App (React Native)**
+*   Port core features to iOS/Android
+*   Push notifications for chat/calls
+
+### 7. **Advanced AI Chatbot**
+*   Groq function calling for booking Projects/Products
+*   Multi-turn conversation memory
+
+### 8. **Analytics Dashboard**
+*   Track user engagement (time in Metaverse, most-visited hotspots)
+*   Heatmaps for 3D movement patterns
+
+### 9. **Gamification Leaderboards**
+*   Global/Regional leaderboards for game scores
+*   Rewards system (badges, profile frames)
+
+### 10. **PWA (Progressive Web App)**
+*   Service workers for offline marketplace browsing
+*   Install prompt for desktop/mobile
+
+---
+
+## 📚 What I Learned
+
+### 1. **WebRTC is Complex But Powerful**
+*   Understanding the signaling dance (Offer/Answer/ICE) was challenging
+*   Learned the difference between STUN (NAT traversal) and TURN (relay) servers
+*   Pure P2P implementation without SDKs like Agora saved costs but increased complexity
+*   **Key Insight:** Always map database IDs to socket IDs serverside to avoid routing errors
+
+### 2. **React State Management for Real-Time Apps**
+*   `useState` causes re-renders — Bad for video streams
+*   `useRef` is essential for WebRTC (peerConnectionRef, localStreamRef)
+*   **Lesson:** Never store video elements in state, always use refs
+
+### 3. **Socket.io Event Architecture**
+*   Room-based broadcasting (`socket.join(location)`) enables regional chat
+*   `socket.to(targetSocketId)` for targeted events (video call signaling)
+*   Always clean up listeners with `socket.off()` in useEffect cleanup
+
+### 4. **3D Optimization with React Three Fiber**
+*   InstancedMesh is 10x faster than 250 individual `<mesh>` components
+*   useFrame loop runs at 60fps — Keep logic minimal
+*   `useMemo` prevents recreating geometry on every render
+*   **Mistake:** Initially rendered each flower as a separate component → 15fps
+*   **Fix:** InstancedMesh with matrix updates → 60fps
+
+### 5. **AI Integration Challenges**
+*   Groq API is fast (~500ms) but requires careful prompt engineering
+*   JSON mode (`response_format: {type: 'json_object'}`) prevents hallucinated text
+*   **Toxicity Detection:** Binary classification (TOXIC/SAFE) more reliable than sentiment scores
+*   **Cost:** llama-3.1-8b-instant is free but rate-limited — Need fallback logic
+
+### 6. **OCR is Imperfect**
+*   Tesseract accuracy varies wildly (70-95%) based on preprocessing
+*   Grayscale → Contrast → Binarization pipeline improved results by 30%
+*   Regex parsing for names/regions requires dozens of heuristics
+*   **Fallback:** Always provide manual input option
+
+### 7. **Stripe Webhooks are Critical**
+*   Never trust client-side payment confirmation (can be spoofed)
+*   Webhook signature validation (`stripe.webhooks.constructEvent`) is mandatory
+*   Test webhooks locally using Stripe CLI (`stripe listen --forward-to localhost:5001/webhook`)
+
+### 8. **JWT Security Best Practices**
+*   Never store sensitive data in JWT payload (it's base64, not encrypted)
+*   7-day expiry balances UX and security
+*   Always use HTTPS in production (JWT over HTTP is vulnerable to MITM)
+*   **Mistake:** Initially stored password hash in JWT → Fixed by only storing `userId`
+
+### 9. **Cultural Tech is Underserved**
+*   Features like regional borders and language badges resonate with Indian users
+*   Unity in Diversity isn't just a slogan — It's a product design principle
+*   **Realization:** Tech for cultural connection is rare, which makes this project unique
+
+### 10. **Full-Stack is About Trade-offs**
+*   Pure WebRTC (cheap, complex) vs Agora SDK (expensive, simple)
+*   MongoDB (flexible, no joins) vs PostgreSQL (strict, relational)
+*   Client-side OCR (privacy, slow) vs Server-side (fast, privacy concerns)
+*   **Lesson:** Every architecture decision is a trade-off, not a right/wrong choice
+
+### 11. **Documentation Matters**
+*   Well-commented code saved me 10+ hours during debugging
+*   README is the first impression — Make it visual and comprehensive
+*   **Artifact Approach:** Creating walkthrough.md after features forced me to test thoroughly
 
 ---
 

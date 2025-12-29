@@ -60,6 +60,7 @@ mongoose.connect(MONGO_URI)
 
 // Socket.io Logic
 const onlineUsers = new Map(); // socketId -> userName
+const userIdToSocket = new Map(); // userId (database ID) -> socketId
 
 io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
@@ -67,10 +68,15 @@ io.on('connection', (socket) => {
     socket.on('join_room', (data) => {
         const room = data.room || data;
         const userName = data.userName || 'Unknown User';
+        const userId = data.userId; // Database ID
         socket.join(room);
 
-        // Track User
+        // Track User by socket ID and database ID
         onlineUsers.set(socket.id, userName);
+        if (userId) {
+            userIdToSocket.set(userId, socket.id);
+            console.log(`Mapped userId ${userId} -> socketId ${socket.id}`);
+        }
 
         // Broadcast updated list
         io.emit('update_online_users', Array.from(onlineUsers.values()));
@@ -142,6 +148,96 @@ io.on('connection', (socket) => {
             console.error("On-demand translation failed:", err);
         }
     });
+
+    // Video Call Signaling Events
+    socket.on('send_video_call_request', (data) => {
+        console.log('DEBUG: Call Request:', data);
+
+        // FIND ALL SOCKETS for this user (Fix for duplicate connections)
+        const targetSocketIds = [];
+        for (const [socketId, userName] of onlineUsers.entries()) {
+            if (userName === data.to) {
+                targetSocketIds.push(socketId);
+            }
+        }
+
+        console.log('DEBUG: Target Socket IDs:', targetSocketIds);
+
+        if (targetSocketIds.length > 0) {
+            // Send to ALL active tabs of this user
+            targetSocketIds.forEach(id => {
+                io.to(id).emit('incoming_video_call', data);
+            });
+            console.log('DEBUG: Call Sent to ALL user sockets');
+        } else {
+            console.log('DEBUG: Target user not found!');
+        }
+    });
+
+    socket.on('accept_video_call', (data) => {
+        // data.callerId is a DATABASE ID, not socket ID!
+        const callerSocketId = userIdToSocket.get(data.callerId);
+
+        if (callerSocketId) {
+            console.log(`Sending call_accepted to caller socket ${callerSocketId}`);
+            io.to(callerSocketId).emit('call_accepted', {
+                receiverSocketId: socket.id, // Send receiver's socket ID for WebRTC
+                receiverName: data.receiverName, // Send receiver's name
+                receiverLocation: data.receiverLocation, // Send receiver's location
+                receiverLanguage: data.receiverLanguage // Send receiver's language
+            });
+        } else {
+            console.error(`Could not find socket for caller ID ${data.callerId}`);
+        }
+    });
+
+    socket.on('decline_video_call', (data) => {
+        io.to(data.callerId).emit('call_declined');
+    });
+
+    // WebRTC Signaling Events
+    socket.on('webrtc_offer', (data) => {
+        console.log('WebRTC Offer from', socket.id, 'to', data.target);
+        io.to(data.target).emit('webrtc_offer', {
+            offer: data.offer,
+            from: socket.id
+        });
+    });
+
+    socket.on('webrtc_answer', (data) => {
+        console.log('WebRTC Answer from', socket.id, 'to', data.target);
+        io.to(data.target).emit('webrtc_answer', {
+            answer: data.answer,
+            from: socket.id
+        });
+    });
+
+    socket.on('ice_candidate', (data) => {
+        console.log('ICE Candidate from', socket.id, 'to', data.target);
+        io.to(data.target).emit('ice_candidate', {
+            candidate: data.candidate,
+            from: socket.id
+        });
+    });
+
+    socket.on('end_video_call', (data) => {
+        console.log('Call ended by', socket.id);
+        if (data.target) {
+            io.to(data.target).emit('call_ended');
+        }
+    });
+
+    socket.on('report_user', (data) => {
+        console.log('⚠️ USER REPORTED:', data);
+        // TODO: Save to database for admin review
+        // db.collection('reports').insertOne({
+        //    reportedUserId: data.reportedUserId,
+        //    reportedName: data.reportedName,
+        //    reporterName: data.reporterName,
+        //    timestamp: data.timestamp
+        // });
+    });
+
 
     socket.on('disconnect', () => {
         onlineUsers.delete(socket.id);

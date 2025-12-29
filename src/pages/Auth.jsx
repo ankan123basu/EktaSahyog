@@ -129,7 +129,7 @@ const Auth = () => {
                 localStorage.setItem('user', JSON.stringify(user));
                 window.dispatchEvent(new Event('user-login'));
                 window.history.replaceState({}, document.title, window.location.pathname);
-                navigate(user.role === 'admin' ? '/dashboard' : '/projects');
+                navigate(user.role === 'admin' ? '/dashboard' : '/marketplace');
             } catch (e) {
                 console.error("Failed to parse", e);
                 setError("Login failed.");
@@ -165,7 +165,7 @@ const Auth = () => {
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             window.dispatchEvent(new Event('user-login'));
-            navigate(data.user.email === 'admin@ektasahyog.com' ? '/dashboard' : '/projects');
+            navigate(data.user.email === 'admin@ektasahyog.com' ? '/dashboard' : '/marketplace');
 
         } catch (err) {
             // Displays backend error message (e.g., "User already exists")
