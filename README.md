@@ -16,18 +16,19 @@ We moved far beyond static MERN applications to architect a cultural-scale digit
 
 In a nation of 28 states, 8 union territories, and 121 languages, EktaSahyog serves one singular purpose: **To Unite India.** It is not just a marketplace or a learning hub; it is a **National Integration Platform** that uses this advanced technology to dissolve the invisible borders that divide us.
 <img width="1890" height="897" alt="image" src="https://github.com/user-attachments/assets/9c1c708c-3cb0-4f34-bd99-556575269055" />
+<img width="1611" height="763" alt="image" src="https://github.com/user-attachments/assets/17ce04ac-e34b-49ff-b337-d34722fd97a0" />
 <img width="1919" height="902" alt="Screenshot 2025-12-20 155125" src="https://github.com/user-attachments/assets/1116c434-476a-42d2-be1c-d08674e976df" />
+<img width="1919" height="913" alt="Screenshot 2025-12-20 154913" src="https://github.com/user-attachments/assets/f4eeb763-04a3-493e-bfa0-c6c927149723" />
 <img width="1919" height="910" alt="Screenshot 2025-12-20 155143 - Copy" src="https://github.com/user-attachments/assets/1596a3ce-df8b-48e8-987f-64c63475c804" />
 <img width="1919" height="913" alt="Screenshot 2025-12-20 154745" src="https://github.com/user-attachments/assets/e26a0bce-1839-41b4-b732-4b57e23f07da" />
 <img width="1919" height="906" alt="Screenshot 2025-12-20 154828" src="https://github.com/user-attachments/assets/af1a947e-5fe6-4116-a006-a82c5489ccd6" />
 <img width="1919" height="912" alt="Screenshot 2025-12-20 154856" src="https://github.com/user-attachments/assets/d11d7733-1d2b-434d-b552-4a5e57bf397b" />
-<img width="1919" height="913" alt="Screenshot 2025-12-20 154913" src="https://github.com/user-attachments/assets/f4eeb763-04a3-493e-bfa0-c6c927149723" />
 <img width="1919" height="912" alt="Screenshot 2025-12-20 154938" src="https://github.com/user-attachments/assets/51039257-6083-48bf-929c-47d42bbe82a5" />
 <img width="1919" height="910" alt="Screenshot 2025-12-20 154951" src="https://github.com/user-attachments/assets/2f534f25-8f60-4b9c-b679-3c8b4b0ee299" />
 <img width="1919" height="916" alt="Screenshot 2025-12-20 155027 - Copy" src="https://github.com/user-attachments/assets/ce1f421f-d527-46b9-9851-6bda1ca6f326" />
 <img width="1919" height="913" alt="Screenshot 2025-12-20 155004" src="https://github.com/user-attachments/assets/bd377a18-bb50-4c5c-affd-25cecc1e5794" />
 <img width="1919" height="907" alt="Screenshot 2025-12-20 155057 - Copy" src="https://github.com/user-attachments/assets/4cc9b826-de7a-42af-9f7c-fed3d4282699" />
-<img width="1919" height="1072" alt="Screenshot 2025-12-23 012500" src="https://github.com/user-attachments/assets/ca69d115-be44-4b73-a94b-feb830217f36" />
+<img width="1919" height="967" alt="Screenshot 2025-12-29 210448" src="https://github.com/user-attachments/assets/32d133b5-f6b8-43f4-82d7-8fc7c6fc4721" />
 
 ## The Mission: Unity through Diversity
 While others build walls, EktaSahyog builds bridges:
@@ -282,6 +283,9 @@ EktaSahyog/
 ---
 
 ## 📊 Data Flow Diagrams
+
+<img width="777" height="608" alt="image" src="https://github.com/user-attachments/assets/059f2b6c-032f-40d4-8481-5721bada6c78" />
+<img width="1271" height="618" alt="image" src="https://github.com/user-attachments/assets/b1366e9c-275a-4269-9453-5c9b10fce840" />
 
 ### 1. Authentication Flow (Email + Google OAuth)
 ```
