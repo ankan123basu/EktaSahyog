@@ -29,6 +29,8 @@ In a nation of 28 states, 8 union territories, and 121 languages, EktaSahyog ser
 <img width="1919" height="913" alt="Screenshot 2025-12-20 155004" src="https://github.com/user-attachments/assets/bd377a18-bb50-4c5c-affd-25cecc1e5794" />
 <img width="1919" height="907" alt="Screenshot 2025-12-20 155057 - Copy" src="https://github.com/user-attachments/assets/4cc9b826-de7a-42af-9f7c-fed3d4282699" />
 <img width="1919" height="967" alt="Screenshot 2025-12-29 210448" src="https://github.com/user-attachments/assets/32d133b5-f6b8-43f4-82d7-8fc7c6fc4721" />
+<img width="1907" height="804" alt="image" src="https://github.com/user-attachments/assets/51badaa5-796b-49ab-915c-84847b42d6f7" />
+<img width="1919" height="908" alt="Screenshot 2026-01-20 021011" src="https://github.com/user-attachments/assets/b7c35c56-f675-4c1e-9c33-30d3572173cb" />
 
 ## The Mission: Unity through Diversity
 While others build walls, EktaSahyog builds bridges:
