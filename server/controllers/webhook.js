@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import Project from '../models/Project.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder');
 
 export const handleStripeWebhook = async (req, res) => {
     const sig = req.headers['stripe-signature'];

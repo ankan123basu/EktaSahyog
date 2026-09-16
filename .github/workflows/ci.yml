@@ -26,9 +26,19 @@ jobs:
 
       - name: Run Vitest Unit & Integration Tests
         run: npm run test
+        env:
+          JWT_SECRET: test_jwt_secret_key
+          STRIPE_SECRET_KEY: sk_test_placeholder
+          GROQ_API_KEY: gsk_placeholder
+          CLIENT_URL: http://localhost:5173
 
       - name: Generate Code Coverage Report
         run: npm run test:coverage
+        env:
+          JWT_SECRET: test_jwt_secret_key
+          STRIPE_SECRET_KEY: sk_test_placeholder
+          GROQ_API_KEY: gsk_placeholder
+          CLIENT_URL: http://localhost:5173
 
       - name: Build Production Frontend
         run: npm run build

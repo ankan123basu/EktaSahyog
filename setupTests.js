@@ -14,5 +14,10 @@ global.ResizeObserver = class ResizeObserver {
     constructor() {}
     disconnect() {}
     observe() {}
-    unobserve() {}
 };
+
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_jwt_secret_key';
+process.env.STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder';
+process.env.GROQ_API_KEY = process.env.GROQ_API_KEY || 'gsk_placeholder';
+process.env.CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+
