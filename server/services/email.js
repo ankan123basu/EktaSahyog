@@ -20,6 +20,10 @@ const transporter = nodemailer.createTransport({
  * @param {number} retries - Number of retries left
  */
 export const sendEmail = async (mailOptions, retries = 3) => {
+    if (process.env.NODE_ENV === 'test' || !process.env.EMAIL_USER) {
+        console.log(`📧 [TEST/MOCK MODE] Simulated email sent to: ${mailOptions.to}`);
+        return { messageId: '<simulated_test_email_id@gmail.com>' };
+    }
     try {
         const info = await transporter.sendMail(mailOptions);
         console.log(`📧 Email sent: ${info.messageId}`);

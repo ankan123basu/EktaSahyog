@@ -57,9 +57,11 @@ app.use(passport.initialize());
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.log('MongoDB Connection Error:', err));
+if (process.env.NODE_ENV !== 'test' && MONGO_URI) {
+    mongoose.connect(MONGO_URI)
+        .then(() => console.log('MongoDB Connected'))
+        .catch(err => console.log('MongoDB Connection Error:', err));
+}
 
 // Socket.io Logic
 const onlineUsers = new Map(); // socketId -> userName
