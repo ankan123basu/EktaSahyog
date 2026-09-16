@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Calendar, Heart, MessageSquare, Share2, Send, Trash2 } from 'lucide-react';
 import { Button } from '../ui/Button';
+import api from '../../api';
 
 const StoryModal = ({ isOpen, onClose, story, onUpdate }) => {
     const [commentText, setCommentText] = useState('');
@@ -17,13 +18,8 @@ const StoryModal = ({ isOpen, onClose, story, onUpdate }) => {
         }
 
         try {
-            const res = await fetch(`http://localhost:5001/stories/${story._id}/like`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user._id })
-            });
-
-            const updatedStory = await res.json();
+            const res = await api.put(`/stories/${story._id}/like`, { userId: user._id });
+            const updatedStory = res.data;
             if (onUpdate) onUpdate(updatedStory);
         } catch (err) {
             console.error('Failed to like story:', err);
@@ -40,17 +36,13 @@ const StoryModal = ({ isOpen, onClose, story, onUpdate }) => {
 
         setIsSubmitting(true);
         try {
-            const res = await fetch(`http://localhost:5001/stories/${story._id}/comment`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: user._id,
-                    userName: user.name,
-                    text: commentText
-                })
+            const res = await api.post(`/stories/${story._id}/comment`, {
+                userId: user._id,
+                userName: user.name,
+                text: commentText
             });
 
-            const updatedStory = await res.json();
+            const updatedStory = res.data;
             if (onUpdate) onUpdate(updatedStory);
             setCommentText('');
         } catch (err) {
@@ -65,13 +57,11 @@ const StoryModal = ({ isOpen, onClose, story, onUpdate }) => {
         if (!user) return;
 
         try {
-            const res = await fetch(`http://localhost:5001/stories/${story._id}/comment/${commentId}`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user._id })
+            const res = await api.delete(`/stories/${story._id}/comment/${commentId}`, {
+                data: { userId: user._id }
             });
 
-            const updatedStory = await res.json();
+            const updatedStory = res.data;
             if (onUpdate) onUpdate(updatedStory);
         } catch (err) {
             console.error('Failed to delete comment:', err);

@@ -31,6 +31,15 @@ export const createProject = async (req, res) => {
 /* GET ALL PROJECTS */
 export const getProjects = async (req, res) => {
     try {
+        const { page, limit } = req.query;
+        if (page && limit) {
+            const pageNum = parseInt(page, 10) || 1;
+            const limitNum = parseInt(limit, 10) || 10;
+            const skip = (pageNum - 1) * limitNum;
+            const projects = await Project.find().skip(skip).limit(limitNum);
+            const total = await Project.countDocuments();
+            return res.status(200).json({ projects, total, page: pageNum, pages: Math.ceil(total / limitNum) });
+        }
         const projects = await Project.find();
         res.status(200).json(projects);
     } catch (err) {
@@ -296,8 +305,8 @@ export const donateToProject = async (req, res) => {
                 },
             ],
             mode: 'payment',
-            success_url: `http://localhost:5173/projects?success=true&projectId=${projectId}`,
-            cancel_url: `http://localhost:5173/projects?canceled=true`,
+            success_url: `${process.env.CLIENT_URL || "http://localhost:5173"}/projects?success=true&projectId=${projectId}`,
+            cancel_url: `${process.env.CLIENT_URL || "http://localhost:5173"}/projects?canceled=true`,
             metadata: {
                 projectId: projectId,
                 amount: amount

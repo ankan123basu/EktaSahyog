@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Link as LinkIcon } from 'lucide-react';
 import { Button } from '../ui/Button';
-import axios from 'axios';
+import api from '../../api';
 
 const AddResourceModal = ({ isOpen, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -20,10 +20,7 @@ const AddResourceModal = ({ isOpen, onClose, onSuccess }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/resources', formData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await api.post('/resources', formData);
             onSuccess();
             onClose();
             setFormData({ title: '', description: '', type: 'digital', category: '', language: '', url: '', location: '' });

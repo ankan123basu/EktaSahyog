@@ -12,6 +12,8 @@ import Ballpit from '../Components/ui/Ballpit';
 import LiquidChrome from '../Components/ui/LiquidChrome';
 import VariableProximity from '../Components/ui/VariableProximity';
 
+import api from '../api';
+
 const Landing = () => {
     const { scrollY } = useScroll();
     const y1 = useTransform(scrollY, [0, 500], [0, 200]);
@@ -19,10 +21,9 @@ const Landing = () => {
     const [totalUsers, setTotalUsers] = useState(0);
 
     useEffect(() => {
-        fetch('http://localhost:5001/auth/users/count')
-            .then(res => res.json())
-            .then(data => {
-                if (data.count) setTotalUsers(data.count);
+        api.get('/auth/users/count')
+            .then(res => {
+                if (res.data.count) setTotalUsers(res.data.count);
             })
             .catch(err => console.error("Error fetching user count:", err));
     }, []);

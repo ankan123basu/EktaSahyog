@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from 'framer-motion';
 import { Send, ChevronLeft, Quote, Sparkles, Volume2, StopCircle } from 'lucide-react';
 import axios from 'axios';
+import api from '../api';
 import { Button } from '../Components/ui/Button';
 import bgImage from '../Images/wmremove-transformed.png';
 import unityThemeBg from '../Images/unity_theme.png';
@@ -65,7 +66,7 @@ const PERSONAS = [
         title: 'SPIRITUAL UNITY',
         desc: 'The Monk who introduced Indian philosophies to the West and awakened the youth.',
         quote: "Arise, awake, and stop not till the goal is reached.",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Swami_Vivekananda-1893-09-signed.jpg/480px-Swami_Vivekananda-1893-09-signed.jpg",
+        image: "https://www.himalayanyogaashram.com/blog/wp-content/uploads/2017/12/swami-vivekananda-1.jpg",
         color: "from-orange-500 to-red-800",
         glow: "shadow-red-500/50",
         imgPos: 'object-[50%_15%]'
@@ -363,7 +364,7 @@ const UnityCouncil = () => {
         setIsLoading(true);
 
         try {
-            const res = await axios.post('http://localhost:5001/api/council/chat', {
+            const res = await api.post('/api/council/chat', {
                 message: input,
                 persona: selectedPersona.id
             });

@@ -4,6 +4,7 @@ import { ShieldCheck, ArrowRight, Loader2, RefreshCw, ArrowLeft } from 'lucide-r
 import { Button } from '../Components/ui/Button';
 import BackgroundBeams from '../Components/ui/BackgroundBeams';
 import axios from 'axios';
+import api from '../api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import bg1 from '../Images/wmremove-transformed.png';
 
@@ -116,7 +117,7 @@ const VerifyEmail = () => {
         setMessage('');
 
         try {
-            const { data } = await axios.post('http://localhost:5001/auth/verify-email', { email, otp: code });
+            const { data } = await api.post('/auth/verify-email', { email, otp: code });
             setMessage(data.message);
             setTimeout(() => {
                 navigate('/auth', { state: { successMessage: "Email Verified Successfully! Please Login." } });
@@ -130,7 +131,7 @@ const VerifyEmail = () => {
 
     const handleResend = async () => {
         try {
-            await axios.post('http://localhost:5001/auth/resend-otp', { email });
+            await api.post('/auth/resend-otp', { email });
             setMessage("New code sent!");
             setTimeout(() => setMessage(''), 3000);
         } catch (err) {

@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || 'dummy_key', dangerouslyAllowBrowser: true });
 
 // The "Soul Scripts" - System Prompts for each persona
 const PERSONAS = {
@@ -140,7 +140,7 @@ export const chatWithCouncil = async (req, res) => {
                     content: message
                 }
             ],
-            model: "llama-3.1-8b-instant", // Lightweight model for speed/quota
+            model: process.env.GROQ_MODEL || "openai/gpt-oss-20b", // Active high-speed model for council personas
             temperature: 0.7,
             max_tokens: 300,
         });

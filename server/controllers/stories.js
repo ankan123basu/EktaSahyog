@@ -29,6 +29,15 @@ export const createStory = async (req, res) => {
 /* GET ALL STORIES */
 export const getStories = async (req, res) => {
     try {
+        const { page, limit } = req.query;
+        if (page && limit) {
+            const pageNum = parseInt(page, 10) || 1;
+            const limitNum = parseInt(limit, 10) || 10;
+            const skip = (pageNum - 1) * limitNum;
+            const stories = await Story.find().sort({ createdAt: -1 }).skip(skip).limit(limitNum);
+            const total = await Story.countDocuments();
+            return res.status(200).json({ stories, total, page: pageNum, pages: Math.ceil(total / limitNum) });
+        }
         const stories = await Story.find().sort({ createdAt: -1 });
         res.status(200).json(stories);
     } catch (err) {

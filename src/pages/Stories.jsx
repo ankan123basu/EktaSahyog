@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, MessageSquare, Heart, PenTool, Search } from 'lucide-react';
 import { Button } from '../Components/ui/Button';
+import api from '../api';
 import StoryModal from '../Components/features/StoryModal';
 import WriteStoryModal from '../Components/features/WriteStoryModal';
 import bg1 from '../Images/wmremove-transformed.png';
@@ -15,8 +16,7 @@ const Stories = () => {
 
     const fetchStories = async () => {
         try {
-            const res = await fetch('http://localhost:5001/stories');
-            const data = await res.json();
+            const { data } = await api.get('/stories');
             setAllStories(data);
             setStories(data);
         } catch (err) {
@@ -49,13 +49,7 @@ const Stories = () => {
                 return;
             }
 
-            const res = await fetch(`http://localhost:5001/stories/${storyId}/like`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user._id })
-            });
-
-            const updatedStory = await res.json();
+            const { data: updatedStory } = await api.put(`/stories/${storyId}/like`, { userId: user._id });
 
             // Update local state
             setStories(prev => prev.map(s =>

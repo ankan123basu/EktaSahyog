@@ -22,6 +22,15 @@ export const createCulture = async (req, res) => {
 /* GET ALL CULTURE CARDS */
 export const getCulture = async (req, res) => {
     try {
+        const { page, limit } = req.query;
+        if (page && limit) {
+            const pageNum = parseInt(page, 10) || 1;
+            const limitNum = parseInt(limit, 10) || 10;
+            const skip = (pageNum - 1) * limitNum;
+            const cultureCards = await Culture.find().populate('submittedBy', 'name').skip(skip).limit(limitNum);
+            const total = await Culture.countDocuments();
+            return res.status(200).json({ cultureCards, total, page: pageNum, pages: Math.ceil(total / limitNum) });
+        }
         const cultureCards = await Culture.find().populate('submittedBy', 'name');
         res.status(200).json(cultureCards);
     } catch (err) {

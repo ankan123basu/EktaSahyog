@@ -3,6 +3,7 @@ import { Send, Languages, MoreVertical, Smile, Paperclip, Mic, X, Sparkles, Glob
 import { Button } from '../ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import chatbotImage from '../../Images/chatbot_preview.png';
+import api from '../../api';
 
 // Theme Imports
 import themeBg1 from '../../Images/unity_theme.png';
@@ -60,9 +61,8 @@ const ChatInterface = ({ channelId, socket }) => {
 
     const fetchHistory = async () => {
         try {
-            const res = await fetch(`http://localhost:5001/chat/history/${channelId}`);
-            const data = await res.json();
-            setMessages(data);
+            const res = await api.get(`/chat/history/${channelId}`);
+            setMessages(res.data);
             setTimeout(() => {
                 messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
             }, 100);
@@ -209,13 +209,8 @@ const ChatInterface = ({ channelId, socket }) => {
         if (messages.length === 0) return;
         setIsSummarizing(true);
         try {
-            const res = await fetch('http://localhost:5001/ai/summarize', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages })
-            });
-            const data = await res.json();
-            setSummary(data.summary);
+            const res = await api.post('/ai/summarize', { messages });
+            setSummary(res.data.summary);
         } catch (err) {
             console.error(err);
         } finally {

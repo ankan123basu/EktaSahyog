@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, Suspense, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { PointerLockControls, Sparkles, Cloud, Text, Stars, Html } from '@react-three/drei';
 import axios from 'axios';
+import api from '../api';
 import Stall from '../Components/metaverse/Stall';
 import ProductDetailsModal from '../Components/features/ProductDetailsModal';
 import Rangoli from '../Components/metaverse/Rangoli';
@@ -403,7 +404,7 @@ const Metaverse = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const res = await axios.get('http://localhost:5001/marketplace');
+                const res = await api.get('/marketplace');
                 if (Array.isArray(res.data)) setProducts(res.data);
                 else setProducts([]);
             } catch (err) {

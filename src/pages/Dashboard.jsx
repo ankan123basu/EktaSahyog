@@ -13,6 +13,7 @@ import {
     Server, Filter, Landmark, Flame, Zap, Heart, Star, Target, Layers
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import api from '../api';
 import bg1 from '../Images/wmremove-transformed.png';
 
 const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981', '#06b6d4', '#3b82f6', '#a855f7', '#d946ef'];
@@ -185,15 +186,12 @@ const Dashboard = () => {
             try {
                 const query = regionFilter !== 'all' ? `?region=${regionFilter}` : '';
                 const [summaryRes, chartRes] = await Promise.all([
-                    fetch(`http://localhost:5001/dashboard/summary${query}`),
-                    fetch(`http://localhost:5001/dashboard/charts${query}`)
+                    api.get(`/dashboard/summary${query}`),
+                    api.get(`/dashboard/charts${query}`)
                 ]);
 
-                const summaryData = await summaryRes.json();
-                const chartData = await chartRes.json();
-
-                setSummary(summaryData);
-                setCharts(chartData);
+                setSummary(summaryRes.data);
+                setCharts(chartRes.data);
             } catch (err) {
                 console.error("Failed to fetch dashboard data", err);
             }

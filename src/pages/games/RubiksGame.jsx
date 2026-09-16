@@ -5,6 +5,7 @@ import { Button } from '../../Components/ui/Button';
 import { useNavigate } from 'react-router-dom';
 import bg1 from '../../Images/wmremove-transformed.png';
 import axios from 'axios';
+import api from '../../api';
 
 const VarnaVyuha = () => {
     const navigate = useNavigate();
@@ -79,7 +80,7 @@ const VarnaVyuha = () => {
     const awardPoints = async () => {
         if (!user) return;
         try {
-            await axios.post('http://localhost:5001/games/update-score', {
+            await api.post('/games/update-score', {
                 userId: user._id,
                 points: 1000
             });

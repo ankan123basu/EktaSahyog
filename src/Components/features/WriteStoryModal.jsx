@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Loader2, PenTool } from 'lucide-react';
 import { Button } from '../ui/Button';
+import api from '../../api';
 
 const WriteStoryModal = ({ isOpen, onClose, onStoryAdded }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -25,11 +26,7 @@ const WriteStoryModal = ({ isOpen, onClose, onStoryAdded }) => {
                 authorId: user ? user._id : null
             };
 
-            await fetch('http://localhost:5001/stories', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            await api.post('/stories', payload);
 
             if (onStoryAdded) onStoryAdded();
             onClose();

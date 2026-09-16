@@ -4,6 +4,7 @@ import { MapPin, ArrowRight, Plus, X, Loader2, Heart } from 'lucide-react';
 import BackgroundBeams from '../Components/ui/BackgroundBeams';
 import { Button } from '../Components/ui/Button';
 import axios from 'axios';
+import api from '../api';
 import HotspotDetailsModal from '../Components/features/HotspotDetailsModal';
 import bg1 from '../Images/wmremove-transformed.png'; // Updated background
 
@@ -47,7 +48,7 @@ const CulturalHotspots = () => {
 
     const fetchHotspots = async () => {
         try {
-            const res = await axios.get('http://localhost:5001/hotspots');
+            const res = await api.get('/hotspots');
             setHotspots(res.data);
             setFilteredHotspots(res.data);
         } catch (err) {
@@ -62,12 +63,9 @@ const CulturalHotspots = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5001/hotspots', {
+            await api.post('/hotspots', {
                 ...formData,
                 tags: formData.tags.split(',').map(t => t.trim())
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
             fetchHotspots();
             setIsModalOpen(false);
@@ -86,10 +84,7 @@ const CulturalHotspots = () => {
         }
 
         try {
-            const token = localStorage.getItem('token');
-            const res = await axios.put(`http://localhost:5001/hotspots/${id}/like`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.put(`/hotspots/${id}/like`, {});
 
             if (res.status === 200) {
                 const updatedSpot = res.data;

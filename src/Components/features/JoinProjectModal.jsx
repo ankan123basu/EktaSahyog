@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '../ui/Button';
+import api from '../../api';
 
 const JoinProjectModal = ({ isOpen, onClose, project, onJoin }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -13,11 +14,7 @@ const JoinProjectModal = ({ isOpen, onClose, project, onJoin }) => {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user) return alert("Please login to join a project.");
 
-            await fetch(`http://localhost:5001/projects/${project._id}/join`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user._id })
-            });
+            await api.patch(`/projects/${project._id}/join`, { userId: user._id });
 
             setIsJoined(true);
             if (onJoin) onJoin();

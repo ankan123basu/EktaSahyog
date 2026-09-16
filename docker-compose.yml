@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - MONGO_URI=mongodb://mongo:27017/ektasahyog
+      - JWT_SECRET=production_jwt_secret_key_change_me
+      - CLIENT_URL=http://localhost:5001
+      - ADMIN_EMAILS=admin@ektasahyog.com
+    depends_on:
+      - mongo
+    restart: always
+
+  mongo:
+    image: mongo:6-alpine
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
+volumes:
+  mongo_data:

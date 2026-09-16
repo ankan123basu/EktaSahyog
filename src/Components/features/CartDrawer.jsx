@@ -3,6 +3,7 @@ import { X, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { Button } from '../ui/Button';
+import api from '../../api';
 
 const CartDrawer = () => {
     const {
@@ -24,16 +25,8 @@ const CartDrawer = () => {
                 return;
             }
 
-            const res = await fetch('http://localhost:5001/payment/create-checkout-session', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ products: cartItems })
-            });
-
-            const data = await res.json();
+            const res = await api.post('/payment/create-checkout-session', { products: cartItems });
+            const data = res.data;
 
             if (data.url) {
                 window.location.href = data.url;

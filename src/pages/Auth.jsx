@@ -5,6 +5,7 @@ import { Button } from '../Components/ui/Button';
 import OCRModal from '../Components/features/OCRModal';
 import BackgroundBeams from '../Components/ui/BackgroundBeams';
 import axios from 'axios';
+import api, { API_URL } from '../api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import bg1 from '../Images/wmremove-transformed.png';
 import unityImage from '../Images/unity-in-diversity-stockcake.webp';
@@ -150,12 +151,11 @@ const Auth = () => {
 
         try {
             const endpoint = isLogin ? '/auth/login' : '/auth/register';
-            const url = `http://localhost:5001${endpoint}`;
             const payload = isLogin
                 ? { email: formData.email, password: formData.password }
                 : { ...formData, location: formData.region, region: { type: "Point", coordinates: [0, 0] } };
 
-            const { data } = await axios.post(url, payload);
+            const { data } = await api.post(endpoint, payload);
 
             if (!isLogin) {
                 navigate('/verify-email', { state: { email: formData.email } });
@@ -285,7 +285,7 @@ const Auth = () => {
                             </div>
 
                             <div className="space-y-4 text-center">
-                                <button type="button" onClick={() => window.location.href = "http://localhost:5001/auth/google"} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
+                                <button type="button" onClick={() => window.location.href = `${API_URL}/auth/google`} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
                                     <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="G" />
                                     Google Account
                                 </button>

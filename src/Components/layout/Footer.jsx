@@ -4,7 +4,7 @@ import { Facebook, Twitter, Instagram, Linkedin, Heart, Mail, MapPin, Phone, Git
 import { Button } from '../ui/Button';
 import LiquidChrome from '../ui/LiquidChrome';
 import logoImage from '../../Images/unity_theme.png';
-import axios from 'axios';
+import api from '../../api';
 
 const Footer = () => {
     const [email, setEmail] = useState('');
@@ -15,7 +15,7 @@ const Footer = () => {
         if (!email) return;
         setIsLoading(true);
         try {
-            await axios.post('http://localhost:5001/newsletter/subscribe', { email });
+            await api.post('/newsletter/subscribe', { email });
             setMessage('Subscribed successfully! 📧');
             setEmail('');
         } catch (err) {

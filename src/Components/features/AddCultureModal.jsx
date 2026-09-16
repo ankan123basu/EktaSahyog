@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Loader2 } from 'lucide-react';
 import { Button } from '../ui/Button';
+import api from '../../api';
 
 const AddCultureModal = ({ isOpen, onClose, onCultureAdded }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -24,11 +25,7 @@ const AddCultureModal = ({ isOpen, onClose, onCultureAdded }) => {
                 submittedBy: user ? user._id : null
             };
 
-            await fetch('http://localhost:5001/culture', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            await api.post('/culture', payload);
 
             if (onCultureAdded) onCultureAdded();
             onClose();

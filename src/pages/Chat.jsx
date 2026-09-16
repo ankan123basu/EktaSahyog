@@ -3,8 +3,9 @@ import ChatSidebar from '../Components/features/ChatSidebar';
 import ChatInterface from '../Components/features/ChatInterface';
 import PageBackground from '../Components/layout/PageBackground';
 import io from 'socket.io-client';
+import { API_URL } from '../api';
 
-const socket = io.connect("http://localhost:5001");
+const socket = io.connect(API_URL);
 
 const Chat = () => {
     const user = JSON.parse(localStorage.getItem('user'));

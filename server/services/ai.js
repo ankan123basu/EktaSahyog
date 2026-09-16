@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Initialize Groq API
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || 'dummy_key', dangerouslyAllowBrowser: true });
 
 // --- 1. CHATBOT SERVICE ---
 export const generateText = async (prompt) => {
@@ -44,7 +44,7 @@ export const generateText = async (prompt) => {
                 { role: "system", content: systemContext },
                 { role: "user", content: prompt }
             ],
-            model: "llama-3.3-70b-versatile", // Smarter model for conversation
+            model: process.env.GROQ_CHAT_MODEL || "openai/gpt-oss-120b", // Active high-capacity model for conversation
             temperature: 0.7,
             max_tokens: 1024,
         });
@@ -67,7 +67,7 @@ export const translateText = async (text, sourceLang, targetLang = 'English') =>
                 { role: "system", content: "You are a highly accurate professional translator. You output only the translation." },
                 { role: "user", content: `${prompt}\n\nText: "${text}"` }
             ],
-            model: "llama-3.1-8b-instant", // Fastest model for real-time features
+            model: process.env.GROQ_MODEL || "openai/gpt-oss-20b", // Fastest active model for real-time features
             temperature: 0.1,
         });
 
@@ -104,7 +104,7 @@ export const isToxicMessage = async (text) => {
                 },
                 { role: "user", content: `Text to analyze: "${text}"` }
             ],
-            model: "llama-3.1-8b-instant",
+            model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
             temperature: 0,
         });
 
@@ -134,7 +134,7 @@ export const analyzeSentiment = async (text) => {
                 },
                 { role: "user", content: `Analyze this: "${text}"` }
             ],
-            model: "llama-3.1-8b-instant",
+            model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
             temperature: 0,
             response_format: { type: "json_object" } // Force JSON mode
         });

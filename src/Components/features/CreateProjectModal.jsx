@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Loader2, Upload, Target } from 'lucide-react';
 import { Button } from '../ui/Button';
-import axios from 'axios';
+import api from '../../api';
 
 const CreateProjectModal = ({ isOpen, onClose, onProjectCreated }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -22,11 +22,6 @@ const CreateProjectModal = ({ isOpen, onClose, onProjectCreated }) => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const config = {
-                headers: { Authorization: `Bearer ${token}` }
-            };
-
             const payload = {
                 ...formData,
                 tags: formData.tags.split(',').map(tag => tag.trim()),
@@ -34,7 +29,7 @@ const CreateProjectModal = ({ isOpen, onClose, onProjectCreated }) => {
                 goalAmount: parseInt(formData.goalAmount)
             };
 
-            await axios.post('http://localhost:5001/projects', payload, config);
+            await api.post('/projects', payload);
             onProjectCreated();
             onClose();
             setFormData({

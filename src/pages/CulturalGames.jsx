@@ -5,6 +5,7 @@ import { Button } from '../Components/ui/Button';
 import BackgroundBeams from '../Components/ui/BackgroundBeams';
 import Ballpit from '../Components/ui/Ballpit';
 import axios from 'axios';
+import api from '../api';
 import bg1 from '../Images/wmremove-transformed.png';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,7 +35,7 @@ const CulturalGames = () => {
     const fetchScore = async () => {
         if (!user) return;
         try {
-            const res = await axios.get(`http://localhost:5001/games/score/${user._id}`);
+            const res = await api.get(`/games/score/${user._id}`);
             setScore(res.data);
         } catch (err) {
             console.error("Error fetching score:", err);
@@ -43,7 +44,7 @@ const CulturalGames = () => {
 
     const fetchLeaderboard = async () => {
         try {
-            const res = await axios.get('http://localhost:5001/games/leaderboard');
+            const res = await api.get('/games/leaderboard');
             setLeaderboard(res.data);
         } catch (err) {
             console.error("Error fetching leaderboard:", err);
@@ -77,7 +78,7 @@ const CulturalGames = () => {
 
             if (result.points > 0) {
                 try {
-                    await axios.post('http://localhost:5001/games/spin-wheel', {
+                    await api.post('/games/spin-wheel', {
                         userId: user._id,
                         points: result.points
                     });

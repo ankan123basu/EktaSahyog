@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Heart, Share2, Plus, Search, Filter } from 'lucide-react';
 import { Button } from '../Components/ui/Button';
+import api from '../api';
 import AddCultureModal from '../Components/features/AddCultureModal';
 import CultureDetailsModal from '../Components/features/CultureDetailsModal';
 import bg1 from '../Images/wmremove-transformed.png';
@@ -20,8 +21,7 @@ const Culture = () => {
 
     const fetchCulture = async () => {
         try {
-            const res = await fetch('http://localhost:5001/culture');
-            const data = await res.json();
+            const { data } = await api.get('/culture');
             setAllCultureCards(data);
             setCultureCards(data);
         } catch (err) {
@@ -58,19 +58,12 @@ const Culture = () => {
         }
 
         try {
-            const res = await fetch(`http://localhost:5001/culture/${card._id}/like`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user._id })
-            });
+            const { data: updatedCard } = await api.put(`/culture/${card._id}/like`, { userId: user._id });
 
-            if (res.ok) {
-                const updatedCard = await res.json();
-
-                // Update local state without refetching all
-                const updateState = (prevCards) => prevCards.map(c =>
-                    c._id === updatedCard._id ? updatedCard : c
-                );
+            // Update local state without refetching all
+            const updateState = (prevCards) => prevCards.map(c =>
+                c._id === updatedCard._id ? updatedCard : c
+            );
 
                 setAllCultureCards(updateState);
                 setCultureCards(updateState);
@@ -79,7 +72,6 @@ const Culture = () => {
                 if (selectedCulture && selectedCulture._id === updatedCard._id) {
                     setSelectedCulture(updatedCard);
                 }
-            }
         } catch (err) {
             console.error("Failed to like", err);
         }

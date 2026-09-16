@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, X, Send, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '../ui/Button';
+import api from '../../api';
 
 import ektaSaathiIcon from '../../Images/ekta_saathi_icon.png';
 
@@ -30,12 +31,8 @@ const AIAssistant = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:5001/ai/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: input })
-            });
-            const data = await response.json();
+            const response = await api.post('/ai/chat', { prompt: input });
+            const data = response.data;
 
             const botMsg = {
                 id: Date.now() + 1,

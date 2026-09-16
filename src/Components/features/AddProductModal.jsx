@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Loader2, Upload } from 'lucide-react';
 import { Button } from '../ui/Button';
-import axios from 'axios';
+import api from '../../api';
 
 const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -22,12 +22,7 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const config = {
-                headers: { Authorization: `Bearer ${token}` }
-            };
-
-            await axios.post('http://localhost:5001/marketplace/create', formData, config);
+            await api.post('/marketplace/create', formData);
             onProductAdded();
             onClose();
             setFormData({ title: '', price: '', artisan: '', region: '', category: 'Textiles', size: '', description: '', image: '' });

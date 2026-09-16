@@ -1,11 +1,13 @@
 import express from 'express';
 import { login, register, getUserStats, getUserCount, getActivityStats, googleCallback, forgotPassword, resetPassword, verifyEmail, resendOTP } from '../controllers/auth.js';
 import passport from 'passport';
+import { validateRegister, validateLogin } from '../middleware/validators.js';
+import { authLimiter } from '../middleware/rateLimiters.js';
 
 const router = express.Router();
 
-router.post('/register', register);
-router.post('/login', login);
+router.post('/register', authLimiter, validateRegister, register);
+router.post('/login', authLimiter, validateLogin, login);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 router.post('/verify-email', verifyEmail);

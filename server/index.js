@@ -45,7 +45,10 @@ app.use('/webhooks', webhookRoutes);
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true
+}));
 app.use(helmet());
 app.use(morgan('common'));
 app.use(passport.initialize());
@@ -302,11 +305,21 @@ app.get('/chat/history/:room', async (req, res) => {
     }
 });
 
+import { errorHandler } from './middleware/errorHandler.js';
+
 app.get('/', (req, res) => {
     res.send('EktaSahyog API is running');
 });
 
+// Centralized Error Handler Middleware
+app.use(errorHandler);
+
 // Start Server
-httpServer.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    httpServer.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
+export { app, httpServer };
+export default app;

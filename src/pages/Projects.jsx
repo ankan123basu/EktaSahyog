@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Calendar, MapPin, ArrowRight, Target, Heart, Search } from 'lucide-react';
 import { Button } from '../Components/ui/Button';
+import api from '../api';
 import CreateProjectModal from '../Components/features/CreateProjectModal';
 import ProjectDetailsModal from '../Components/features/ProjectDetailsModal'; // New Modal
 import bg1 from '../Images/wmremove-transformed.png';
@@ -20,8 +21,7 @@ const Projects = () => {
 
     const fetchProjects = async () => {
         try {
-            const res = await fetch('http://localhost:5001/projects');
-            const data = await res.json();
+            const { data } = await api.get('/projects');
             setAllProjects(data);
             setProjects(data);
         } catch (err) {
@@ -63,16 +63,10 @@ const Projects = () => {
             return;
         }
         try {
-            const res = await fetch(`http://localhost:5001/projects/${project._id}/join`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user._id })
-            });
-            if (res.ok) {
-                alert("Successfully joined! Check your email for details.");
-                fetchProjects();
-                setSelectedProject(null);
-            }
+            await api.patch(`/projects/${project._id}/join`, { userId: user._id });
+            alert("Successfully joined! Check your email for details.");
+            fetchProjects();
+            setSelectedProject(null);
         } catch (err) {
             console.error("Error joining project:", err);
         }
@@ -83,16 +77,10 @@ const Projects = () => {
         if (!confirm("Are you sure you want to cancel your participation?")) return;
 
         try {
-            const res = await fetch(`http://localhost:5001/projects/${project._id}/leave`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user._id })
-            });
-            if (res.ok) {
-                alert("Participation cancelled.");
-                fetchProjects();
-                setSelectedProject(null); // Close modal
-            }
+            await api.patch(`/projects/${project._id}/leave`, { userId: user._id });
+            alert("Participation cancelled.");
+            fetchProjects();
+            setSelectedProject(null); // Close modal
         } catch (err) {
             console.error("Error leaving project:", err);
         }
@@ -102,12 +90,7 @@ const Projects = () => {
         if (!amount) return;
 
         try {
-            const res = await fetch('http://localhost:5001/projects/donate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ projectId: project._id, amount: parseInt(amount) })
-            });
-            const session = await res.json();
+            const { data: session } = await api.post('/projects/donate', { projectId: project._id, amount: parseInt(amount) });
 
             // Redirect to Stripe Checkout using the session URL
             if (session.url) {

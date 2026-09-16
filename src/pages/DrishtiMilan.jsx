@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Video, Phone, PhoneOff, Mic, MicOff, Camera, CameraOff, ArrowLeftRight } from 'lucide-react';
 import io from 'socket.io-client';
+import { API_URL } from '../api';
 import PageBackground from '../Components/layout/PageBackground';
 import { Button } from '../Components/ui/Button';
 
-const socket = io.connect("http://localhost:5001");
+const socket = io.connect(API_URL);
 
 // Regional styles for cultural borders
 const REGIONAL_STYLES = {

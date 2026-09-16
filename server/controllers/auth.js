@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import { sendEmail, getEmailTemplate } from '../services/email.js';
 
 
@@ -20,6 +20,9 @@ export const register = async (req, res) => {
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt);
 
+        const adminEmails = (process.env.ADMIN_EMAILS || 'admin@ektasahyog.com').split(',').map(e => e.trim().toLowerCase());
+        const isAdmin = adminEmails.includes(email.toLowerCase());
+
         const newUser = new User({
             name,
             email,
@@ -27,7 +30,7 @@ export const register = async (req, res) => {
             region,
             location,
             language,
-            role: email === 'admin@ektasahyog.com' ? 'admin' : 'user',
+            role: isAdmin ? 'admin' : 'user',
             otp: Math.floor(100000 + Math.random() * 900000).toString(), // 6 digit OTP
             otpExpires: Date.now() + 10 * 60 * 1000 // 10 Minutes
         });
@@ -78,13 +81,13 @@ export const login = async (req, res) => {
             }
         }
 
-        // Force Admin Role for specific email (Fix for existing user)
-        if (email === 'admin@ektasahyog.com' && user.role !== 'admin') {
+        const adminEmails = (process.env.ADMIN_EMAILS || 'admin@ektasahyog.com').split(',').map(e => e.trim().toLowerCase());
+        if (adminEmails.includes(email.toLowerCase()) && user.role !== 'admin') {
             user.role = 'admin';
             await user.save();
         }
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
         const userObj = user.toObject();
         delete userObj.password;
 
@@ -158,17 +161,14 @@ export const getUserCount = async (req, res) => {
 /* GET ACTIVITY STATS */
 export const getActivityStats = async (req, res) => {
     try {
-        const totalUsers = await User.countDocuments();
-        // Generate 12 points of data ending at current time
         const data = [];
         const now = new Date();
         for (let i = 11; i >= 0; i--) {
             const time = new Date(now.getTime() - i * 5 * 60000); // 5 min intervals
-            // Simulate slight fluctuation around totalUsers
-            const fluctuation = Math.floor(Math.random() * 20) - 10;
+            const count = await User.countDocuments({ createdAt: { $lte: time } });
             data.push({
                 time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                count: Math.max(0, totalUsers + fluctuation)
+                count
             });
         }
         res.status(200).json(data);
@@ -280,7 +280,7 @@ export const verifyEmail = async (req, res) => {
         await user.save();
 
         // Login User
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
         const userObj = user.toObject();
         delete userObj.password;
 
@@ -331,7 +331,7 @@ export const resendOTP = async (req, res) => {
 export const googleCallback = async (req, res) => {
     try {
         const user = req.user;
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         // Sanitize User
         const userObj = user.toObject();

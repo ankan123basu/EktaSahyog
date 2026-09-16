@@ -6,6 +6,7 @@ import ProductCard from '../Components/features/ProductCard';
 import AddProductModal from '../Components/features/AddProductModal';
 import ProductDetailsModal from '../Components/features/ProductDetailsModal';
 import { Button } from '../Components/ui/Button';
+import api from '../api';
 import bg1 from '../Images/wmremove-transformed.png';
 
 const CATEGORIES = ["All", "Textiles", "Handicrafts", "Art", "Sweets", "Decor"];
@@ -39,8 +40,7 @@ const Marketplace = () => {
     // Fetch Products from Backend
     const fetchProducts = async () => {
         try {
-            const res = await fetch('http://localhost:5001/marketplace');
-            const data = await res.json();
+            const { data } = await api.get('/marketplace');
             setAllProducts(data);
             setProducts(data);
         } catch (err) {
@@ -113,34 +113,13 @@ const Marketplace = () => {
         setPurchaseModal(prev => ({ ...prev, type: 'loading' }));
 
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:5001/marketplace/buy-with-points', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ productId: product._id })
+            const { data } = await api.post('/marketplace/buy-with-points', { productId: product._id });
+            setPurchaseModal({
+                show: true,
+                type: 'success',
+                product: product,
+                message: `Success! You bought ${product.title}. Remaining Points: ${data.remainingPoints}`
             });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                setPurchaseModal({
-                    show: true,
-                    type: 'success',
-                    product: product,
-                    message: `Success! You bought ${product.title}. Remaining Points: ${data.remainingPoints}`
-                });
-                // Optional: Refresh products or user points if stored in context
-            } else {
-                setPurchaseModal({
-                    show: true,
-                    type: 'error',
-                    product: product,
-                    message: data.message || "Purchase failed"
-                });
-            }
         } catch (err) {
             console.error("Error buying with points:", err);
             setPurchaseModal({

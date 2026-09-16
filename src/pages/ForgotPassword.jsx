@@ -4,6 +4,7 @@ import { Mail, ArrowRight, Loader2, ArrowLeft, KeyRound } from 'lucide-react';
 import { Button } from '../Components/ui/Button';
 import BackgroundBeams from '../Components/ui/BackgroundBeams';
 import axios from 'axios';
+import api from '../api';
 import { useNavigate } from 'react-router-dom';
 import bg1 from '../Images/wmremove-transformed.png';
 
@@ -91,7 +92,7 @@ const ForgotPassword = () => {
         setMessage('');
 
         try {
-            const { data } = await axios.post('http://localhost:5001/auth/forgot-password', { email });
+            const { data } = await api.post('/auth/forgot-password', { email });
             setMessage(data.message);
         } catch (err) {
             setError(err.response?.data?.error || "Failed to send reset email.");

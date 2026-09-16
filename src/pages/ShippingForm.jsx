@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Truck, CheckCircle, MapPin, Loader2 } from 'lucide-react';
 import { Button } from '../Components/ui/Button';
 import axios from 'axios';
+import api from '../api';
 import bg1 from '../Images/wmremove-transformed.png';
 
 const ShippingForm = () => {
@@ -40,7 +41,7 @@ const ShippingForm = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            await axios.post(`http://localhost:5001/marketplace/shipping/${orderId}`, formData);
+            await api.post(`/marketplace/shipping/${orderId}`, formData);
             setIsSuccess(true);
         } catch (err) {
             console.error("Shipping Update Error", err);

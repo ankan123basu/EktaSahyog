@@ -41,7 +41,7 @@ export const createProduct = async (req, res) => {
 /* GET ALL PRODUCTS */
 export const getProducts = async (req, res) => {
     try {
-        const { category, search } = req.query;
+        const { category, search, page, limit } = req.query;
         let query = {};
 
         if (category && category !== 'All') {
@@ -53,6 +53,15 @@ export const getProducts = async (req, res) => {
                 { title: { $regex: search, $options: 'i' } },
                 { region: { $regex: search, $options: 'i' } },
             ];
+        }
+
+        if (page && limit) {
+            const pageNum = parseInt(page, 10) || 1;
+            const limitNum = parseInt(limit, 10) || 10;
+            const skip = (pageNum - 1) * limitNum;
+            const products = await Product.find(query).sort({ createdAt: -1 }).skip(skip).limit(limitNum);
+            const total = await Product.countDocuments(query);
+            return res.status(200).json({ products, total, page: pageNum, pages: Math.ceil(total / limitNum) });
         }
 
         const products = await Product.find(query).sort({ createdAt: -1 });

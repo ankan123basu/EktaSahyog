@@ -4,6 +4,7 @@ import { Lock, ArrowRight, Loader2, CheckCircle, AlertCircle } from 'lucide-reac
 import { Button } from '../Components/ui/Button';
 import BackgroundBeams from '../Components/ui/BackgroundBeams';
 import axios from 'axios';
+import api from '../api';
 import { useParams, useNavigate } from 'react-router-dom';
 import bg1 from '../Images/wmremove-transformed.png';
 
@@ -100,7 +101,7 @@ const ResetPassword = () => {
         setMessage('');
 
         try {
-            const { data } = await axios.post(`http://localhost:5001/auth/reset-password/${token}`, { password });
+            const { data } = await api.post(`/auth/reset-password/${token}`, { password });
             setMessage(data.message);
             setTimeout(() => {
                 navigate('/auth');

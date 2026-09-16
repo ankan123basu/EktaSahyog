@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Download, Box, FileText, Share2 } from 'lucide-react';
 import { Button } from '../Components/ui/Button';
 import { motion } from 'framer-motion';
 
-import axios from 'axios';
+import api from '../api';
 import AddResourceModal from '../Components/features/AddResourceModal';
 
 
@@ -17,7 +17,7 @@ const Resources = () => {
 
     const fetchResources = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:5000/resources?type=${filter}&search=${search}`);
+            const { data } = await api.get(`/resources?type=${filter}&search=${search}`);
             setResources(data);
             setLoading(false);
         } catch (err) {

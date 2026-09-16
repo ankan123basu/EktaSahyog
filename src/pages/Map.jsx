@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MapVisualizer from '../Components/features/MapVisualizer';
 import { Layers, Map as MapIcon, Users, Activity, ShoppingBag, Palette, MapPin, Globe } from 'lucide-react';
 import bg1 from '../Images/wmremove-transformed.png';
+import api from '../api';
 
 const MapPage = () => {
     // 1. State for Data
@@ -23,9 +24,9 @@ const MapPage = () => {
     // Region Mapping Helper
     const STATE_GROUPS = {
         "North India": ["Delhi", "Haryana", "Himachal Pradesh", "Jammu", "Kashmir", "Ladakh", "Punjab", "Rajasthan", "Uttar Pradesh", "Uttarakhand", "Chandigarh"],
-        "South India": ["Andhra Pradesh", "Karnataka", "Kerala", "Tamil Nadu", "Telangana", "Puducherry", "Lakshadweep"],
-        "East India": ["Bihar", "Jharkhand", "Odisha", "West Bengal", "Andaman and Nicobar Islands"],
-        "West India": ["Goa", "Gujarat", "Maharashtra", "Dadra and Nagar Haveli and Daman and Diu"],
+        "South India": ["Andhra Pradesh", "Karnataka", "Kerala", "Tamil Nadu", "Telangana", "Puducherry", "Lakshadweep", "Andaman"],
+        "East India": ["Bihar", "Jharkhand", "Odisha", "West Bengal"],
+        "West India": ["Goa", "Gujarat", "Maharashtra", "Dadra", "Daman"],
         "Central India": ["Chhattisgarh", "Madhya Pradesh"],
         "North East India": ["Arunachal Pradesh", "Assam", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Sikkim", "Tripura"]
     };
@@ -36,18 +37,18 @@ const MapPage = () => {
         const fetchAllData = async () => {
             try {
                 const [usersRes, projectsRes, productsRes, hotspotsRes, cultureRes] = await Promise.all([
-                    fetch('http://localhost:5001/auth/users/count'),
-                    fetch('http://localhost:5001/projects'),
-                    fetch('http://localhost:5001/marketplace'),
-                    fetch('http://localhost:5001/hotspots'),
-                    fetch('http://localhost:5001/culture')
+                    api.get('/auth/users/count'),
+                    api.get('/projects'),
+                    api.get('/marketplace'),
+                    api.get('/hotspots'),
+                    api.get('/culture')
                 ]);
 
-                const usersData = await usersRes.json();
-                const projectsData = await projectsRes.json();
-                const productsData = await productsRes.json();
-                const hotspotsData = await hotspotsRes.json();
-                const cultureData = await cultureRes.json();
+                const usersData = usersRes.data;
+                const projectsData = projectsRes.data;
+                const productsData = productsRes.data;
+                const hotspotsData = hotspotsRes.data;
+                const cultureData = cultureRes.data;
 
                 setStats({
                     users: usersData.count || 0,
