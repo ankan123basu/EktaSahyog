@@ -61,16 +61,12 @@
 
 ---
 
-## 📖 Introduction & Mission
+## 📖 Introduction
+**EktaSahyog** is a next-generation Unity & Collaboration platform engineered at the intersection of the **MERN stack**, **WebGL-powered browser-native Web3D**, **AI-driven systems**, **OCR**, and **real-time infrastructure**.
 
-**EktaSahyog** is a next-generation national integration and community collaboration platform engineered to connect diverse regions across India using modern web architecture:
+We moved far beyond static MERN applications to architect a cultural-scale digital ecosystem — fusing multilingual AI communication, low-latency real-time collaboration, interactive cultural experiences, and WebGL-powered 3D environments to digitally represent India’s unity in motion.
 
-1. **Linguistic Unity**: Real-time AI chat pipeline with automatic translation across 8+ Indian languages powered by Groq LLM inference.
-2. **Economic Unity**: Fair-trade cultural marketplace directly connecting rural artisans to urban buyers.
-3. **Ideological & Historical Guidance**: Interactive AI persona debate chamber (*The Unity Council*) featuring Sardar Vallabhbhai Patel, Rabindranath Tagore, Swami Vivekananda, Dr. B.R. Ambedkar, and Sarojini Naidu.
-4. **Immersive WebGL Metaverse**: Browser-native 3D digital village built using React Three Fiber (`@react-three/fiber` & `three.js`) with instanced particle rendering.
-5. **Direct Video Collaboration (*Drishti-Milan*)**: Pure WebRTC peer-to-peer 1-on-1 audio/video calling using Socket.IO SDP offer/answer/ICE candidate signaling.
-6. **Privacy-Preserving Client OCR**: Local browser document text extraction using Tesseract.js Web Workers and HTML5 Canvas binarization.
+In a nation of 28 states, 8 union territories, and 121 languages, EktaSahyog serves one singular purpose: **To Unite India.** It is not just a marketplace or a learning hub; it is a **National Integration Platform** that uses this advanced technology to dissolve the invisible borders that divide us.
 
 ---
 
