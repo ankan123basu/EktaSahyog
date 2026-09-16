@@ -1,7 +1,7 @@
 <div align="center">
   <h1>EktaSahyog (Unity & Collaboration Platform) 🇮🇳</h1>
   <p><strong><em>"Bridging India's Cultural Divide through Technology"</em></strong></p>
-  <p><em>An Autonomous, Multilingual National Integration Platform Fostering Cultural Unity, Economic Equity, and Real-Time Community Collaboration Across India</em></p>
+  <p><em>A Multilingual National Integration & Community Collaboration Platform Fostering Cultural Unity and Economic Equity Across India</em></p>
 </div>
 
 [![React 19](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
